@@ -1,0 +1,185 @@
+import { NextResponse } from "next/server";
+import nodemailer from "nodemailer";
+
+// In-memory sliding-window rate limiter per IP address
+// Default: Max 5 inquiries per IP every 15 minutes
+const rateLimitMap = new Map();
+const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+const MAX_REQUESTS_PER_WINDOW = 5;
+
+function checkRateLimit(ip) {
+  const now = Date.now();
+
+  // Housekeeping: purge expired IPs if map grows large
+  if (rateLimitMap.size > 2000) {
+    for (const [key, val] of rateLimitMap.entries()) {
+      if (val.expiresAt < now) rateLimitMap.delete(key);
+    }
+  }
+
+  const record = rateLimitMap.get(ip);
+  if (!record || record.expiresAt < now) {
+    rateLimitMap.set(ip, { count: 1, expiresAt: now + RATE_LIMIT_WINDOW_MS });
+    return { limited: false, remaining: MAX_REQUESTS_PER_WINDOW - 1 };
+  }
+
+  if (record.count >= MAX_REQUESTS_PER_WINDOW) {
+    return { limited: true, remaining: 0 };
+  }
+
+  record.count += 1;
+  return { limited: false, remaining: MAX_REQUESTS_PER_WINDOW - record.count };
+}
+
+export async function POST(request) {
+  try {
+    // 1. Extract Client IP
+    const forwarded = request.headers.get("x-forwarded-for");
+    const ip = forwarded
+      ? forwarded.split(",")[0].trim()
+      : request.headers.get("x-real-ip") || "127.0.0.1";
+
+    // 2. IP Rate Limit Check
+    const { limited } = checkRateLimit(ip);
+    if (limited) {
+      return NextResponse.json(
+        {
+          error:
+            "Too many submissions from your connection. Please wait 15 minutes before trying again, or call our team directly at +91 99601 94497.",
+        },
+        { status: 429 }
+      );
+    }
+
+    // 3. Parse Body
+    const body = await request.json();
+    const { name, email, phone, service, budget, message, company_fax } = body;
+
+    // 4. Honeypot Anti-Bot Trap:
+    // 'company_fax' is invisible to human users. If filled, it's an automated bot.
+    if (company_fax && company_fax.trim().length > 0) {
+      // Silently accept so bot thinks it succeeded, but send NO email
+      return NextResponse.json({ success: true });
+    }
+
+    // 5. Input Validation & Bounds
+    if (!name || typeof name !== "string" || name.trim().length < 2) {
+      return NextResponse.json({ error: "Please provide your full name." }, { status: 400 });
+    }
+    if (name.length > 100) {
+      return NextResponse.json({ error: "Name must be under 100 characters." }, { status: 400 });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email.trim()) || email.length > 120) {
+      return NextResponse.json({ error: "Please provide a valid work email address." }, { status: 400 });
+    }
+
+    if (!message || typeof message !== "string" || message.trim().length < 5) {
+      return NextResponse.json({ error: "Please provide a brief message describing your requirements." }, { status: 400 });
+    }
+    if (message.length > 3000) {
+      return NextResponse.json({ error: "Message is too long (maximum 3000 characters)." }, { status: 400 });
+    }
+
+    // Sanitize string inputs for safe HTML email rendering
+    const sanitize = (str) =>
+      str
+        ? String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;")
+        : "";
+
+    const safeName = sanitize(name.trim());
+    const safeEmail = sanitize(email.trim());
+    const safePhone = sanitize((phone || "").trim()) || "—";
+    const safeService = sanitize(service || "General Automation Inquiry");
+    const safeBudget = sanitize(budget || "Standard");
+    const safeMessage = sanitize(message.trim()).replace(/\n/g, "<br/>");
+
+    // 6. Transporter Setup
+    // If SMTP credentials are not yet configured in .env.local, log and return graceful response
+    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+      console.warn("SMTP Warning: GMAIL_USER or GMAIL_APP_PASSWORD not set in environment.");
+      return NextResponse.json({
+        success: true,
+        mock: true,
+        note: "Inquiry received in dev mode (SMTP credentials pending in .env.local).",
+      });
+    }
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_APP_PASSWORD,
+      },
+    });
+
+    const recipient = process.env.CONTACT_RECIPIENT || "sales@comeetindia.com";
+
+    // 7. Send Email
+    await transporter.sendMail({
+      from: `"Comeet Controls Portal" <${process.env.GMAIL_USER}>`,
+      to: recipient,
+      replyTo: email.trim(),
+      subject: `[Website Inquiry] ${safeService} - ${safeName}`,
+      html: `
+        <div style="font-family:Arial,Helvetica,sans-serif;max-width:640px;margin:0 auto;background:#f8fafc;padding:24px;border-radius:12px;border:1px solid #e2e8f0;">
+          <div style="background:linear-gradient(135deg,#0066ff,#00b4ff);padding:24px;border-radius:8px;text-align:center;color:#ffffff;">
+            <h1 style="margin:0;font-size:22px;letter-spacing:-0.5px;">New Website Inquiry</h1>
+            <p style="margin:6px 0 0;opacity:0.9;font-size:13px;">Comeet Controls Pvt. Ltd. · Customer Portal</p>
+          </div>
+          
+          <div style="background:#ffffff;padding:28px;border-radius:8px;margin-top:16px;box-shadow:0 2px 4px rgba(0,0,0,0.04);">
+            <table style="width:100%;border-collapse:collapse;font-size:14px;line-height:1.6;">
+              <tr>
+                <td style="padding:10px 0;border-bottom:1px solid #edf2f7;color:#64748b;width:140px;"><strong>Client Name</strong></td>
+                <td style="padding:10px 0;border-bottom:1px solid #edf2f7;color:#0f172a;font-weight:600;">${safeName}</td>
+              </tr>
+              <tr>
+                <td style="padding:10px 0;border-bottom:1px solid #edf2f7;color:#64748b;"><strong>Work Email</strong></td>
+                <td style="padding:10px 0;border-bottom:1px solid #edf2f7;color:#0066ff;"><a href="mailto:${safeEmail}" style="color:#0066ff;text-decoration:none;">${safeEmail}</a></td>
+              </tr>
+              <tr>
+                <td style="padding:10px 0;border-bottom:1px solid #edf2f7;color:#64748b;"><strong>Contact Phone</strong></td>
+                <td style="padding:10px 0;border-bottom:1px solid #edf2f7;color:#0f172a;"><a href="tel:${safePhone}" style="color:#0f172a;text-decoration:none;">${safePhone}</a></td>
+              </tr>
+              <tr>
+                <td style="padding:10px 0;border-bottom:1px solid #edf2f7;color:#64748b;"><strong>Service Category</strong></td>
+                <td style="padding:10px 0;border-bottom:1px solid #edf2f7;color:#0f172a;">${safeService}</td>
+              </tr>
+              <tr>
+                <td style="padding:10px 0;border-bottom:1px solid #edf2f7;color:#64748b;"><strong>Timeline / Urgency</strong></td>
+                <td style="padding:10px 0;border-bottom:1px solid #edf2f7;color:#0f172a;">${safeBudget}</td>
+              </tr>
+              <tr>
+                <td style="padding:14px 0 6px;color:#64748b;vertical-align:top;"><strong>Project Scope</strong></td>
+                <td style="padding:14px 0 6px;color:#0f172a;line-height:1.7;">${safeMessage}</td>
+              </tr>
+            </table>
+
+            <div style="margin-top:24px;padding:14px 18px;background:#f0f9ff;border-left:4px solid #00b4ff;border-radius:4px;font-size:12px;color:#0369a1;">
+              <strong>Quick Tip:</strong> Simply click &ldquo;Reply&rdquo; in your email client to respond directly to ${safeName} (${safeEmail}).
+            </div>
+          </div>
+          
+          <p style="text-align:center;font-size:11px;color:#94a3b8;margin:16px 0 0;">
+            Submission IP: ${ip} · Received: ${new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })} IST
+          </p>
+        </div>
+      `,
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Contact API Server Error:", error);
+    return NextResponse.json(
+      { error: "Failed to process inquiry. Please call us directly at +91 99601 94497." },
+      { status: 500 }
+    );
+  }
+}
