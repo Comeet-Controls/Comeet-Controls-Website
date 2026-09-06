@@ -1,0 +1,19 @@
+Issue Type,Summary,Description,Priority,Story Points,Sprint,Epic Name,Epic Link
+Epic,Discovery & Asset Management,Gathering client media logos machine specs and freezing project requirements,High,8,Sprint 1,Discovery & Asset Management,
+Epic,Visual Media & Content Refinement,Replacing placeholder images with real factory photos adding brochure downloads and WhatsApp integration,High,13,Sprint 2,Visual Media & Content Refinement,
+Epic,Backend Security & Lead Workflows,Configuring live company SMTP email routing rate limiting and anti-spam defenses,High,13,Sprint 3,Backend Security & Lead Workflows,
+Epic,QA Domain Deployment & Handover,Cross-browser testing DNS cutover for comeetindia.com SSL verification and client sign-off,Highest,8,Sprint 4,QA Domain Deployment & Handover,
+Story,Conduct Stakeholder Discovery Meeting,Run 30-minute discovery meeting with Comeet Controls management using the questionnaire,Highest,3,Sprint 1,,Discovery & Asset Management
+Task,Collect High-Res Logo and Brand Files,Obtain vector SVG or transparent PNG logo files from client for dark and light backgrounds,High,2,Sprint 1,,Discovery & Asset Management
+Task,Gather Real Machine Photos and Case Studies,Acquire 10-15 high resolution photos of installed SPMs test benches and control panels,High,3,Sprint 1,,Discovery & Asset Management
+Story,Optimize and Integrate Real Machine Photography,Convert client photos to modern WebP format with Next.js responsive image sizing,High,5,Sprint 2,,Visual Media & Content Refinement
+Story,Add Downloadable Product Brochure and Line Sheets,Implement PDF brochure download buttons on About and Services pages,Medium,3,Sprint 2,,Visual Media & Content Refinement
+Story,Integrate Floating WhatsApp Quick-Connect Widget,Add floating WhatsApp button linked to company number for mobile visitor inquiries,Medium,2,Sprint 2,,Visual Media & Content Refinement
+Story,Embed Interactive Google Map Location,Add interactive map embed for Sukhwani Fairview Thergaon Chinchwad works on Contact page,Low,3,Sprint 2,,Visual Media & Content Refinement
+Story,Connect Live Corporate SMTP Credentials,Set up production Gmail App Password or Google Workspace SMTP for sales@comeetindia.com,Highest,5,Sprint 3,,Backend Security & Lead Workflows
+Story,Implement Anti-Spam Honeypot and IP Rate Limiter,Verify that contact inquiries are limited to 5 per 15 mins per IP and bots are dropped,High,3,Sprint 3,,Backend Security & Lead Workflows
+Task,Configure Pune Local Business SEO Schema,Add LocalBusiness JSON-LD structured data for Google Search indexing in Pune Maharashtra,Medium,3,Sprint 3,,Backend Security & Lead Workflows
+Story,Cross-Device and Browser QA Audit,Test responsive layouts and form submissions across iOS Safari Android Chrome and desktop,High,3,Sprint 4,,QA Domain Deployment & Handover
+Task,Configure Domain DNS Records on Registrar,Add A record 76.76.21.21 and CNAME record for www pointing to Vercel on comeetindia.com,Highest,3,Sprint 4,,QA Domain Deployment & Handover
+Task,Verify Auto-SSL and HTTPS Certificate,Ensure SSL certificate is active on comeetindia.com with 0 mixed-content warnings,High,1,Sprint 4,,QA Domain Deployment & Handover
+Story,Final Client Sign-Off and Training Handover,Deliver project documentation maintenance guide and obtain official client acceptance,High,1,Sprint 4,,QA Domain Deployment & Handover
