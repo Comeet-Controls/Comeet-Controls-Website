@@ -78,8 +78,23 @@ export default function Services() {
                   <div className={`w-16 h-16 rounded-[18px] flex items-center justify-center text-2xl mb-6 relative z-10 transition-all duration-300 group-hover:scale-110 group-hover:-rotate-6 ${s.cls}`}>
                     <i className={`fas ${s.icon}`} />
                   </div>
-                  <h3 className="font-head font-semibold text-lg mb-3 relative z-10">{s.title}</h3>
+                  <h3 className="font-head font-semibold text-lg mb-2 relative z-10">{s.title}</h3>
+                  {/* Blue tagline — only shown if admin filled it in */}
+                  {s.tagline && (
+                    <p className="text-accent text-xs font-semibold mb-3 relative z-10">{s.tagline}</p>
+                  )}
                   <p className="text-muted text-sm leading-relaxed relative z-10">{s.description || s.desc}</p>
+                  {/* Capability bullet points — only shown if admin added them */}
+                  {Array.isArray(s.capabilities) && s.capabilities.length > 0 && (
+                    <ul className="mt-4 space-y-1.5 relative z-10">
+                      {s.capabilities.filter(Boolean).map((cap, ci) => (
+                        <li key={ci} className="flex items-start gap-2 text-xs text-muted">
+                          <i className="fas fa-check-circle text-accent mt-0.5 flex-shrink-0" />
+                          <span>{cap}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                   <div className="flex items-center gap-1.5 text-accent text-xs font-semibold mt-5 relative z-10 transition-all duration-300 group-hover:gap-3">
                     Learn More <i className="fas fa-arrow-right" />
                   </div>
