@@ -66,7 +66,9 @@ async function _doInit() {
       cls VARCHAR(200),
       title VARCHAR(200) NOT NULL,
       description TEXT,
-      sort_order INTEGER DEFAULT 0
+      sort_order INTEGER DEFAULT 0,
+      tagline TEXT,
+      capabilities JSONB DEFAULT '[]'
     )
   `;
 
@@ -89,6 +91,10 @@ async function _doInit() {
       sort_order INTEGER DEFAULT 0
     )
   `;
+
+  // Migrations — add new columns to existing tables without dropping data
+  await sql`ALTER TABLE cms_services ADD COLUMN IF NOT EXISTS tagline TEXT`;
+  await sql`ALTER TABLE cms_services ADD COLUMN IF NOT EXISTS capabilities JSONB DEFAULT '[]'`;
 
   await seed();
 }
@@ -179,16 +185,94 @@ async function seed() {
   const svcRows = await sql`SELECT COUNT(*) as count FROM cms_services`;
   if (parseInt(svcRows[0].count) === 0) {
     const servicesData = [
-      { num: "01", icon: "fa-gears",       cls: "bg-accent2/15 text-accent2",       title: "Special Purpose Machines",   description: "Custom-designed SPMs — full design, development, installation, and commissioning to meet your unique production requirements.", sort_order: 0 },
-      { num: "02", icon: "fa-microchip",   cls: "bg-accent/15 text-accent",          title: "PLC & HMI Programming",      description: "Expert PLC, HMI, VFD, and servo-based programming for smooth machine operation and precise process automation.", sort_order: 1 },
-      { num: "03", icon: "fa-display",     cls: "bg-[#00c8a0]/15 text-[#00c8a0]",   title: "SCADA Development",          description: "Comprehensive SCADA design and development for real-time monitoring, control, and data acquisition across your plant.", sort_order: 2 },
-      { num: "04", icon: "fa-bolt",        cls: "bg-[#9650ff]/15 text-[#9650ff]",   title: "Electrical Control Panels",  description: "Design and manufacturing of PLC control panels and power distribution panels to exacting industry standards.", sort_order: 3 },
-      { num: "05", icon: "fa-wrench",      cls: "bg-yellow-400/15 text-yellow-400", title: "Troubleshooting & AMC",      description: "Expert fault-finding team that minimizes downtime and keeps your production lines running at peak efficiency.", sort_order: 4 },
-      { num: "06", icon: "fa-layer-group", cls: "bg-[#ff3c78]/15 text-[#ff3c78]",  title: "Laser Cutting & Components", description: "Precision acrylic and wood laser cutting, hardware engineering, and supply of automation and control components.", sort_order: 5 },
+      {
+        num: "01", icon: "fa-gears", cls: "bg-accent2/15 text-accent2",
+        title: "Special Purpose Machines",
+        description: "Custom-designed SPMs — full design, development, installation, and commissioning to meet your unique production requirements.",
+        tagline: "Custom-engineered automated machinery to solve complex assembly and testing bottlenecks.",
+        capabilities: JSON.stringify([
+          "End-of-line component testing rigs and inspection benches",
+          "Automated and semi-automated multi-station assembly lines",
+          "Pneumatic, hydraulic, and servo-driven indexing mechanisms",
+          "Poka-Yoke error-proofing, sensor verification, and barcode tracking",
+          "Complete 3D CAD modeling, structural FEA, and fabrication",
+        ]),
+        sort_order: 0,
+      },
+      {
+        num: "02", icon: "fa-microchip", cls: "bg-accent/15 text-accent",
+        title: "PLC & HMI Programming",
+        description: "Expert PLC, HMI, VFD, and servo-based programming for smooth machine operation and precise process automation.",
+        tagline: "Deterministic control logic, intuitive touch interfaces, and fail-safe interlocking.",
+        capabilities: JSON.stringify([
+          "Siemens TIA Portal (S7-1200, S7-1500, Safety PLCs)",
+          "Rockwell Automation Studio 5000 / RSLogix (ControlLogix, CompactLogix)",
+          "Mitsubishi Electric (GX Works 2/3, iQ-R, FX Series)",
+          "Schneider Electric EcoStruxure & Delta Automation PLCs",
+          "Ergonomic HMI screens with recipe handling, event logs, and animated mimics",
+        ]),
+        sort_order: 1,
+      },
+      {
+        num: "03", icon: "fa-display", cls: "bg-[#00c8a0]/15 text-[#00c8a0]",
+        title: "SCADA Development",
+        description: "Comprehensive SCADA design and development for real-time monitoring, control, and data acquisition across your plant.",
+        tagline: "Real-time plant visibility, historical data trending, and enterprise integration.",
+        capabilities: JSON.stringify([
+          "Centralized SCADA architecture with client-server deployment",
+          "Real-time graphical plant mimics and interactive equipment control",
+          "High-speed SQL data logging and automated shift/daily PDF reports",
+          "OPC-UA, Modbus TCP/RTU, Profinet, and MQTT protocol integration",
+          "Mobile and web-based dashboard access for plant managers",
+        ]),
+        sort_order: 2,
+      },
+      {
+        num: "04", icon: "fa-bolt", cls: "bg-[#9650ff]/15 text-[#9650ff]",
+        title: "Electrical Control Panels",
+        description: "Design and manufacturing of PLC control panels and power distribution panels to exacting industry standards.",
+        tagline: "Engineered panel manufacturing compliant with IEC/IS industrial standards.",
+        capabilities: JSON.stringify([
+          "IP55 / IP65 enclosure ratings with climate control (AC/exhaust fans)",
+          "Computerized ferruling, structured wiring routing, and neat busbar layouts",
+          "Comprehensive electrical schematics created in EPLAN Electric P8",
+          "Short-circuit withstand, megger insulation, and high-voltage testing",
+          "CE/IS standard compliance with branded switchgear (Schneider, Siemens, ABB)",
+        ]),
+        sort_order: 3,
+      },
+      {
+        num: "05", icon: "fa-wrench", cls: "bg-yellow-400/15 text-yellow-400",
+        title: "Troubleshooting & AMC",
+        description: "Expert fault-finding team that minimizes downtime and keeps your production lines running at peak efficiency.",
+        tagline: "Emergency fault diagnosis, cycle time optimization, and legacy modernization.",
+        capabilities: JSON.stringify([
+          "24/7 on-site emergency troubleshooting across Pune & Maharashtra",
+          "Legacy controller migration (e.g. Siemens S5 to S7, older Omron to modern PLCs)",
+          "Drive tuning, VFD harmonic minimization, and servo jitter reduction",
+          "Cycle-time reduction audits and software refactoring",
+          "Annual Maintenance Contracts (AMC) with scheduled preventative audits",
+        ]),
+        sort_order: 4,
+      },
+      {
+        num: "06", icon: "fa-layer-group", cls: "bg-[#ff3c78]/15 text-[#ff3c78]",
+        title: "Laser Cutting & Components",
+        description: "Precision acrylic and wood laser cutting, hardware engineering, and supply of automation and control components.",
+        tagline: "High-precision CNC cutting for enclosures, acrylics, wood, and hardware distribution.",
+        capabilities: JSON.stringify([
+          "High-precision laser cutting of acrylic panels, polycarbonate shields, and wood",
+          "Custom machine fascia plates, engraved legend plates, and terminal covers",
+          "Supply of certified industrial automation sensors, proximity switches, and relays",
+          "VFDs, servo packages, power supplies, and terminal blocks at competitive rates",
+          "Rapid prototyping and custom bracket fabrication for machine sensors",
+        ]),
+        sort_order: 5,
+      },
     ];
     for (const s of servicesData) {
-      await sql`INSERT INTO cms_services (num, icon, cls, title, description, sort_order)
-                VALUES (${s.num}, ${s.icon}, ${s.cls}, ${s.title}, ${s.description}, ${s.sort_order})`;
+      await sql`INSERT INTO cms_services (num, icon, cls, title, description, tagline, capabilities, sort_order)
+                VALUES (${s.num}, ${s.icon}, ${s.cls}, ${s.title}, ${s.description}, ${s.tagline}, ${s.capabilities}, ${s.sort_order})`;
     }
   }
 
@@ -277,19 +361,25 @@ export async function deleteProject(id) {
 // Query helpers — Services
 // ---------------------------------------------------------------------------
 export async function getServices() {
-  return await sql`SELECT * FROM cms_services ORDER BY sort_order ASC, id ASC`;
+  const rows = await sql`SELECT * FROM cms_services ORDER BY sort_order ASC, id ASC`;
+  return rows.map((r) => ({
+    ...r,
+    capabilities: typeof r.capabilities === "string" ? JSON.parse(r.capabilities) : (r.capabilities ?? []),
+  }));
 }
-export async function createService({ num, icon, cls, title, description, sort_order }) {
+export async function createService({ num, icon, cls, title, description, sort_order, tagline, capabilities }) {
+  const capsJson = JSON.stringify(capabilities ?? []);
   const rows = await sql`
-    INSERT INTO cms_services (num, icon, cls, title, description, sort_order)
-    VALUES (${num}, ${icon}, ${cls}, ${title}, ${description}, ${sort_order ?? 0})
+    INSERT INTO cms_services (num, icon, cls, title, description, sort_order, tagline, capabilities)
+    VALUES (${num}, ${icon}, ${cls}, ${title}, ${description}, ${sort_order ?? 0}, ${tagline ?? null}, ${capsJson})
     RETURNING *`;
   return rows[0];
 }
-export async function updateService(id, { num, icon, cls, title, description, sort_order }) {
+export async function updateService(id, { num, icon, cls, title, description, sort_order, tagline, capabilities }) {
+  const capsJson = JSON.stringify(capabilities ?? []);
   const rows = await sql`
     UPDATE cms_services SET num=${num}, icon=${icon}, cls=${cls}, title=${title},
-    description=${description}, sort_order=${sort_order ?? 0}
+    description=${description}, sort_order=${sort_order ?? 0}, tagline=${tagline ?? null}, capabilities=${capsJson}
     WHERE id=${id} RETURNING *`;
   return rows[0];
 }
