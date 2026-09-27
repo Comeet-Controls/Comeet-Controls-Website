@@ -2,17 +2,18 @@
 import { useEffect, useRef } from "react";
 
 const items = [
-  { icon:"fa-gauge-high",        label:"Performance & Reliability Testing"  },
-  { icon:"fa-hammer",            label:"Durability & Strength Validation"   },
-  { icon:"fa-leaf",              label:"Energy Efficiency Optimization"     },
-  { icon:"fa-flask",             label:"Calibration & Functional Testing"   },
-  { icon:"fa-truck-fast",        label:"On-Time Delivery & After-Sales Support" },
-  { icon:"fa-screwdriver-wrench",label:"Installation & Commissioning Services"  },
+  { icon:"fa-gauge-high",        label:"Performance & Reliability Testing"       },
+  { icon:"fa-hammer",            label:"Durability & Strength Validation"        },
+  { icon:"fa-leaf",              label:"Energy Efficiency Optimization"          },
+  { icon:"fa-flask",             label:"Calibration & Functional Testing"        },
+  { icon:"fa-truck-fast",        label:"On-Time Delivery & After-Sales Support"  },
+  { icon:"fa-screwdriver-wrench",label:"Installation & Commissioning Services"   },
+  { icon:"fa-headset",           label:"24/7 Post-Handover Support"             },
 ];
 const bars = [
-  { pct: 100, label: "Customer Satisfaction Rate"  },
-  { pct: 98,  label: "On-Time Project Delivery"    },
-  { pct: 99,  label: "Zero-Defect Commissioning"   },
+  { pct: 100, label: "FAT Clearance on 1st Run"      },
+  { pct: 98,  label: "On-Time Commissioning Rate"    },
+  { pct: 100, label: "Customer Satisfaction Rate"    },
 ];
 
 export default function Quality() {

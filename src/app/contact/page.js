@@ -350,6 +350,53 @@ export default function ContactPage() {
           </div>
         </div>
       </section>
+
+      {/* Google Maps Embed — Comeet Controls, Chinchwad Pune */}
+      <section className="pb-24 max-w-6xl mx-auto px-6">
+        <div className="mb-6">
+          <div className="inline-flex items-center gap-2 text-accent text-xs font-semibold uppercase tracking-widest mb-2">
+            <span className="w-6 h-0.5 bg-accent rounded" /> Find Us
+          </div>
+          <h2 className="font-head text-2xl font-bold">
+            Our Pune <span className="gradient-text">Facility</span>
+          </h2>
+          <p className="text-muted text-sm mt-1">
+            709, Sukhwani Fairview, Near Aditya Birla Hospital, Thergaon, Chinchwad, Pune – 411033
+          </p>
+        </div>
+        <div className="relative rounded-3xl overflow-hidden border border-accent/15 shadow-[0_20px_60px_rgba(0,0,0,0.4)]">
+          {/* Dark overlay strip at bottom for brand cohesion */}
+          <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-bg/80 to-transparent z-10 pointer-events-none" />
+          <iframe
+            title="Comeet Controls Pvt. Ltd. — Pune Location"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3781.3765055685253!2d73.78649931489!3d18.655148987368!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc2b9e12ad7e3ef%3A0x4b4c6e9c6f0b2d45!2sSukhwani%20Fairview%2C%20Thergaon%2C%20Pimpri-Chinchwad%2C%20Maharashtra%20411033!5e0!3m2!1sen!2sin!4v1680000000000!5m2!1sen!2sin"
+            width="100%"
+            height="420"
+            style={{ border: 0, display: "block" }}
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
+        </div>
+        <div className="mt-4 flex flex-wrap gap-3 justify-end">
+          <a
+            href="https://maps.google.com/?q=Sukhwani+Fairview+Thergaon+Chinchwad+Pune+411033"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-accent text-xs font-semibold border border-accent/25 bg-accent/5 hover:bg-accent/15 px-4 py-2 rounded-full transition-all"
+          >
+            <i className="fas fa-map-location-dot" /> Open in Google Maps
+          </a>
+          <a
+            href="https://www.google.com/maps/dir/?api=1&destination=Sukhwani+Fairview+Thergaon+Chinchwad+Pune"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-[#25d366] text-xs font-semibold border border-[#25d366]/25 bg-[#25d366]/5 hover:bg-[#25d366]/15 px-4 py-2 rounded-full transition-all"
+          >
+            <i className="fas fa-diamond-turn-right" /> Get Directions
+          </a>
+        </div>
+      </section>
     </div>
   );
 }

@@ -1,6 +1,11 @@
-"use client";
-import { useEffect, useRef } from "react";
 import Link from "next/link";
+import { getCertifications, initDB } from "@/lib/db";
+
+export const metadata = {
+  title: "Quality Assurance | Comeet Controls Pvt. Ltd.",
+  description:
+    "Explore Comeet Controls' rigorous quality assurance protocols, testing standards, and international certifications for industrial automation and SPM solutions.",
+};
 
 const pillars = [
   {
@@ -36,38 +41,28 @@ const pillars = [
 ];
 
 const metrics = [
-  { pct: 100, label: "Customer Satisfaction Rate", sub: "Based on post-installation client surveys" },
-  { pct: 98,  label: "On-Time Project Delivery",     sub: "Rigorous milestone tracking and supply chain management" },
-  { pct: 99,  label: "Zero-Defect Commissioning",    sub: "First-run clearance during customer acceptance testing" },
-  { pct: 99.8, label: "Field Uptime Reliability",    sub: "Operational reliability across deployed machines" },
+  { pct: 100, label: "Customer Satisfaction Rate",  sub: "Based on post-installation client surveys" },
+  { pct: 98,  label: "On-Time Project Delivery",    sub: "Rigorous milestone tracking and supply chain management" },
+  { pct: 99,  label: "Zero-Defect Commissioning",   sub: "First-run clearance during customer acceptance testing" },
+  { pct: 99.8,label: "Field Uptime Reliability",    sub: "Operational reliability across deployed machines" },
 ];
 
-const standards = [
-  { code: "IEC 60204-1", title: "Safety of Machinery", desc: "Electrical equipment of industrial machines" },
-  { code: "ISO 13849-1", title: "Functional Safety", desc: "Safety-related parts of machine control systems" },
-  { code: "IS 8623 / IEC 61439", title: "Switchgear Assemblies", desc: "Low-voltage electrical control panels" },
-  { code: "IP55 / IP65", title: "Ingress Protection", desc: "Dust-tight and water-spray resistant enclosures" },
+const DEFAULT_CERTIFICATIONS = [
+  { id: 1, code: "IEC 60204-1",         title: "Safety of Machinery",   description: "Electrical equipment of industrial machines" },
+  { id: 2, code: "ISO 13849-1",          title: "Functional Safety",     description: "Safety-related parts of machine control systems" },
+  { id: 3, code: "IS 8623 / IEC 61439", title: "Switchgear Assemblies", description: "Low-voltage electrical control panels" },
+  { id: 4, code: "IP55 / IP65",          title: "Ingress Protection",    description: "Dust-tight and water-spray resistant enclosures" },
 ];
 
-export default function QualityPage() {
-  const barRefs = useRef([]);
-
-  useEffect(() => {
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          barRefs.current.forEach((el) => {
-            if (el) el.style.width = el.dataset.width + "%";
-          });
-          obs.disconnect();
-        }
-      },
-      { threshold: 0.2 }
-    );
-    const container = document.getElementById("metrics-section");
-    if (container) obs.observe(container);
-    return () => obs.disconnect();
-  }, []);
+export default async function QualityPage() {
+  let standards = DEFAULT_CERTIFICATIONS;
+  try {
+    await initDB();
+    const rows = await getCertifications();
+    if (rows && rows.length > 0) standards = rows;
+  } catch {
+    // DB not available — use defaults
+  }
 
   return (
     <div className="pt-8 pb-24">
@@ -145,7 +140,7 @@ export default function QualityPage() {
         </div>
       </section>
 
-      {/* Animated Metrics Section */}
+      {/* Metrics Section */}
       <section id="metrics-section" className="py-24 max-w-6xl mx-auto px-6">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <div className="inline-flex items-center gap-2 text-accent text-xs font-semibold uppercase tracking-widest mb-3">
@@ -157,7 +152,7 @@ export default function QualityPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {metrics.map((m, idx) => (
+          {metrics.map((m) => (
             <div key={m.label} className="bg-surface border border-accent/15 rounded-2xl p-8 relative overflow-hidden card-hover">
               <div className="flex items-baseline justify-between mb-2">
                 <span className="font-head font-extrabold text-4xl text-accent">{m.pct}%</span>
@@ -167,10 +162,8 @@ export default function QualityPage() {
               <p className="text-muted text-xs mb-5">{m.sub}</p>
               <div className="h-2 rounded-full bg-accent/10 overflow-hidden">
                 <div
-                  ref={(el) => (barRefs.current[idx] = el)}
-                  data-width={m.pct}
-                  className="h-full rounded-full bg-gradient-to-r from-accent2 to-accent bar-fill"
-                  style={{ width: "0%" }}
+                  className="h-full rounded-full bg-gradient-to-r from-accent2 to-accent"
+                  style={{ width: `${m.pct}%` }}
                 />
               </div>
             </div>
@@ -178,7 +171,7 @@ export default function QualityPage() {
         </div>
       </section>
 
-      {/* Compliance & Standards */}
+      {/* Compliance & Standards — driven by CMS data */}
       <section className="py-20 bg-bg2 border-t border-b border-accent/10">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center max-w-2xl mx-auto mb-14">
@@ -192,12 +185,12 @@ export default function QualityPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {standards.map((s) => (
-              <div key={s.code} className="bg-surface border border-accent/15 rounded-2xl p-6 text-center card-hover">
+              <div key={s.id ?? s.code} className="bg-surface border border-accent/15 rounded-2xl p-6 text-center card-hover">
                 <span className="font-mono text-xs font-bold text-accent bg-accent/10 border border-accent/20 px-3 py-1 rounded-full uppercase">
                   {s.code}
                 </span>
                 <h3 className="font-head font-bold text-base text-ctext mt-4 mb-1">{s.title}</h3>
-                <p className="text-muted text-xs">{s.desc}</p>
+                <p className="text-muted text-xs">{s.description || s.desc}</p>
               </div>
             ))}
           </div>

@@ -77,8 +77,23 @@ export default function About() {
               </div>
             ))}
           </div>
+
+          {/* Brochure Download — enabled once PDF is placed at public/brochure.pdf */}
+          <div className="mt-8 flex flex-wrap gap-3">
+            <a
+              href="/brochure.pdf"
+              download="Comeet-Controls-Company-Brochure.pdf"
+              className="brochure-tooltip inline-flex items-center gap-2 bg-surface border border-accent/25 text-accent text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-accent/10 transition-all"
+              data-tip="PDF will be available soon"
+              onClick={(e) => e.preventDefault()}
+              aria-disabled="true"
+            >
+              <i className="fas fa-file-pdf text-[#ff3c78]" /> Download Company Brochure
+            </a>
+          </div>
         </div>
       </div>
     </section>
   );
 }
+

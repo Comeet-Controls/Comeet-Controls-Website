@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getServices, initDB } from "@/lib/db";
 
 export const metadata = {
   title: "Services & Capabilities | Comeet Controls Pvt. Ltd. - Industrial Automation Pune",
@@ -6,16 +7,11 @@ export const metadata = {
     "Explore our complete industrial automation services: Special Purpose Machines (SPMs), PLC & HMI programming, SCADA development, electrical control panels, and troubleshooting.",
 };
 
-const services = [
-  {
-    id: "spm",
-    num: "01",
-    icon: "fa-gears",
-    color: "text-accent2",
+// Static detailed capabilities — too rich for CMS, stays hardcoded
+const serviceDetails = {
+  "Special Purpose Machines": {
     badge: "Turnkey Machine Building",
-    title: "Special Purpose Machines (SPMs)",
     tagline: "Custom-engineered automated machinery to solve complex assembly and testing bottlenecks.",
-    desc: "We design, fabricate, wire, program, and commission custom Special Purpose Machines built specifically for your cycle time, part geometry, and throughput targets.",
     capabilities: [
       "End-of-line component testing rigs and inspection benches",
       "Automated and semi-automated multi-station assembly lines",
@@ -24,15 +20,9 @@ const services = [
       "Complete 3D CAD modeling, structural FEA, and fabrication",
     ],
   },
-  {
-    id: "plc-hmi",
-    num: "02",
-    icon: "fa-microchip",
-    color: "text-accent",
+  "PLC & HMI Programming": {
     badge: "Industrial Software",
-    title: "PLC & HMI Programming",
     tagline: "Deterministic control logic, intuitive touch interfaces, and fail-safe interlocking.",
-    desc: "Our programming team brings deep proficiency across leading global automation brands. We write modular, well-documented code that is easy for plant technicians to navigate.",
     capabilities: [
       "Siemens TIA Portal (S7-1200, S7-1500, Safety PLCs)",
       "Rockwell Automation Studio 5000 / RSLogix (ControlLogix, CompactLogix)",
@@ -41,15 +31,9 @@ const services = [
       "Ergonomic HMI screens with recipe handling, event logs, and animated mimics",
     ],
   },
-  {
-    id: "scada",
-    num: "03",
-    icon: "fa-display",
-    color: "text-[#00c8a0]",
+  "SCADA Development": {
     badge: "Industry 4.0 & Telemetry",
-    title: "SCADA & Industrial IoT Development",
     tagline: "Real-time plant visibility, historical data trending, and enterprise integration.",
-    desc: "Transform machine data into actionable operational intelligence. We build plant-wide supervisory systems that track OEE, production counts, energy metrics, and downtime causes.",
     capabilities: [
       "Centralized SCADA architecture with client-server deployment",
       "Real-time graphical plant mimics and interactive equipment control",
@@ -58,15 +42,9 @@ const services = [
       "Mobile and web-based dashboard access for plant managers",
     ],
   },
-  {
-    id: "panels",
-    num: "04",
-    icon: "fa-bolt",
-    color: "text-[#9650ff]",
+  "Electrical Control Panels": {
     badge: "Manufacturing & Assembly",
-    title: "Electrical Control Panels & Power Distribution",
     tagline: "Engineered panel manufacturing compliant with IEC/IS industrial standards.",
-    desc: "In-house panel shop producing PLC control panels, Power Control Centers (PCC), Motor Control Centers (MCC), VFD drives panels, and APFC power factor correction units.",
     capabilities: [
       "IP55 / IP65 enclosure ratings with climate control (AC/exhaust fans)",
       "Computerized ferruling, structured wiring routing, and neat busbar layouts",
@@ -75,15 +53,9 @@ const services = [
       "CE/IS standard compliance with branded switchgear (Schneider, Siemens, ABB)",
     ],
   },
-  {
-    id: "troubleshooting",
-    num: "05",
-    icon: "fa-wrench",
-    color: "text-gold",
+  "Troubleshooting & AMC": {
     badge: "Lifecycle Support",
-    title: "Troubleshooting, Retrofitting & AMC",
     tagline: "Emergency fault diagnosis, cycle time optimization, and legacy modernization.",
-    desc: "When machines break down or older PLC systems become obsolete, our rapid-response automation engineers diagnose faults, replace obsolete hardware, and optimize performance.",
     capabilities: [
       "24/7 on-site emergency troubleshooting across Pune & Maharashtra",
       "Legacy controller migration (e.g. Siemens S5 to S7, older Omron to modern PLCs)",
@@ -92,15 +64,9 @@ const services = [
       "Annual Maintenance Contracts (AMC) with scheduled preventative audits",
     ],
   },
-  {
-    id: "laser",
-    num: "06",
-    icon: "fa-layer-group",
-    color: "text-[#ff3c78]",
+  "Laser Cutting & Components": {
     badge: "Fabrication & Parts",
-    title: "Precision Laser Cutting & Automation Components",
     tagline: "High-precision CNC cutting for enclosures, acrylics, wood, and hardware distribution.",
-    desc: "Equipped with state-of-the-art CNC laser cutting machinery for custom machine covers, acrylic display panels, signage, and precision component distribution.",
     capabilities: [
       "High-precision laser cutting of acrylic panels, polycarbonate shields, and wood",
       "Custom machine fascia plates, engraved legend plates, and terminal covers",
@@ -109,6 +75,15 @@ const services = [
       "Rapid prototyping and custom bracket fabrication for machine sensors",
     ],
   },
+};
+
+const DEFAULT_SERVICES = [
+  { id: 1, num: "01", icon: "fa-gears",       cls: "bg-accent2/15 text-accent2",       title: "Special Purpose Machines",   description: "Custom-designed SPMs — full design, development, installation, and commissioning to meet your unique production requirements.",  sort_order: 0 },
+  { id: 2, num: "02", icon: "fa-microchip",   cls: "bg-accent/15 text-accent",          title: "PLC & HMI Programming",      description: "Expert PLC, HMI, VFD, and servo-based programming for smooth machine operation and precise process automation.",              sort_order: 1 },
+  { id: 3, num: "03", icon: "fa-display",     cls: "bg-[#00c8a0]/15 text-[#00c8a0]",   title: "SCADA Development",          description: "Comprehensive SCADA design and development for real-time monitoring, control, and data acquisition across your plant.",          sort_order: 2 },
+  { id: 4, num: "04", icon: "fa-bolt",        cls: "bg-[#9650ff]/15 text-[#9650ff]",   title: "Electrical Control Panels",  description: "Design and manufacturing of PLC control panels and power distribution panels to exacting industry standards.",                  sort_order: 3 },
+  { id: 5, num: "05", icon: "fa-wrench",      cls: "bg-yellow-400/15 text-yellow-400", title: "Troubleshooting & AMC",      description: "Expert fault-finding team that minimizes downtime and keeps your production lines running at peak efficiency.",                sort_order: 4 },
+  { id: 6, num: "06", icon: "fa-layer-group", cls: "bg-[#ff3c78]/15 text-[#ff3c78]",  title: "Laser Cutting & Components", description: "Precision acrylic and wood laser cutting, hardware engineering, and supply of automation and control components.",              sort_order: 5 },
 ];
 
 const processSteps = [
@@ -119,11 +94,23 @@ const processSteps = [
   { step: "05", title: "Site Commissioning & Handover", desc: "On-site installation, production ramp-up support, operator training, and comprehensive documentation." },
 ];
 
-export default function ServicesPage() {
+export default async function ServicesPage() {
+  let services = DEFAULT_SERVICES;
+  try {
+    await initDB();
+    const rows = await getServices();
+    if (rows && rows.length > 0) services = rows;
+  } catch {
+    // DB not available — use defaults
+  }
+
   return (
     <div className="pt-8 pb-24">
       {/* Header Banner */}
-      <section className="relative py-20 overflow-hidden border-b border-accent/10" style={{ background: "radial-gradient(ellipse 60% 50% at 50% 0%,rgba(0,102,255,0.15),transparent 70%),#020c18" }}>
+      <section
+        className="relative py-20 overflow-hidden border-b border-accent/10"
+        style={{ background: "radial-gradient(ellipse 60% 50% at 50% 0%,rgba(0,102,255,0.15),transparent 70%),#020c18" }}
+      >
         <div className="max-w-6xl mx-auto px-6">
           <div className="inline-flex items-center gap-2 text-accent text-xs font-semibold uppercase tracking-widest mb-4 bg-accent/10 border border-accent/25 px-4 py-1.5 rounded-full">
             <span className="w-2 h-2 rounded-full bg-accent dot-pulse" />
@@ -142,51 +129,60 @@ export default function ServicesPage() {
 
       {/* Detailed Services Grid */}
       <section className="py-24 max-w-6xl mx-auto px-6 space-y-16">
-        {services.map((s, idx) => (
-          <div
-            key={s.id}
-            id={s.id}
-            className={`grid grid-cols-1 lg:grid-cols-12 gap-12 items-center bg-surface border border-accent/15 rounded-3xl p-8 md:p-12 card-hover`}
-          >
-            <div className={`lg:col-span-7 ${idx % 2 === 1 ? "lg:order-2" : ""}`}>
-              <div className="flex items-center gap-3 mb-4">
-                <span className="text-xs font-bold font-head uppercase tracking-wider bg-accent/10 text-accent px-3 py-1 rounded-full border border-accent/20">
-                  {s.badge}
-                </span>
-                <span className="text-xs text-muted font-mono">SERVICE #{s.num}</span>
+        {services.map((s, idx) => {
+          const detail = serviceDetails[s.title] || {};
+          return (
+            <div
+              key={s.id ?? s.num}
+              id={s.id}
+              className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center bg-surface border border-accent/15 rounded-3xl p-8 md:p-12 card-hover"
+            >
+              <div className={`lg:col-span-7 ${idx % 2 === 1 ? "lg:order-2" : ""}`}>
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-xs font-bold font-head uppercase tracking-wider bg-accent/10 text-accent px-3 py-1 rounded-full border border-accent/20">
+                    {detail.badge || s.title}
+                  </span>
+                  <span className="text-xs text-muted font-mono">SERVICE #{s.num}</span>
+                </div>
+                <h2 className="font-head text-2xl md:text-3xl font-bold text-ctext mb-3">{s.title}</h2>
+                {detail.tagline && <p className="text-accent text-sm font-medium mb-4">{detail.tagline}</p>}
+                <p className="text-muted text-sm leading-relaxed mb-6">{s.description}</p>
+                {detail.capabilities && (
+                  <>
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-ctext mb-3">Key Technical Scope:</h4>
+                    <ul className="space-y-2.5 mb-8">
+                      {detail.capabilities.map((cap) => (
+                        <li key={cap} className="text-xs text-muted flex items-start gap-2.5">
+                          <i className="fas fa-check-circle text-accent text-sm mt-0.5" />
+                          <span>{cap}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+                <Link
+                  href="/contact"
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-accent2 to-accent text-white text-xs font-semibold px-6 py-3 rounded-full hover:shadow-lg hover:shadow-accent/20 transition-all"
+                >
+                  Inquire About This Service <i className="fas fa-arrow-right text-[10px]" />
+                </Link>
               </div>
-              <h2 className="font-head text-2xl md:text-3xl font-bold text-ctext mb-3">{s.title}</h2>
-              <p className="text-accent text-sm font-medium mb-4">{s.tagline}</p>
-              <p className="text-muted text-sm leading-relaxed mb-6">{s.desc}</p>
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-ctext mb-3">Key Technical Scope:</h4>
-              <ul className="space-y-2.5 mb-8">
-                {s.capabilities.map((cap) => (
-                  <li key={cap} className="text-xs text-muted flex items-start gap-2.5">
-                    <i className="fas fa-check-circle text-accent text-sm mt-0.5" />
-                    <span>{cap}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/contact"
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-accent2 to-accent text-white text-xs font-semibold px-6 py-3 rounded-full hover:shadow-lg hover:shadow-accent/20 transition-all"
-              >
-                Inquire About This Service <i className="fas fa-arrow-right text-[10px]" />
-              </Link>
-            </div>
 
-            <div className={`lg:col-span-5 ${idx % 2 === 1 ? "lg:order-1" : ""} flex flex-col items-center justify-center p-8 rounded-2xl bg-bg/60 border border-accent/10 text-center relative overflow-hidden`}>
-              <div className="w-24 h-24 rounded-3xl bg-accent/10 border border-accent/25 flex items-center justify-center text-4xl mb-6 shadow-inner">
-                <i className={`fas ${s.icon} ${s.color}`} />
+              <div
+                className={`lg:col-span-5 ${idx % 2 === 1 ? "lg:order-1" : ""} flex flex-col items-center justify-center p-8 rounded-2xl bg-bg/60 border border-accent/10 text-center relative overflow-hidden`}
+              >
+                <div className={`w-24 h-24 rounded-3xl flex items-center justify-center text-4xl mb-6 shadow-inner ${s.cls || "bg-accent/10 text-accent"}`}>
+                  <i className={`fas ${s.icon}`} />
+                </div>
+                <span className="font-head font-extrabold text-6xl text-white/5 absolute -bottom-4 right-4 select-none">
+                  {s.num}
+                </span>
+                <div className="text-sm font-head font-semibold text-ctext mb-1">Comeet Controls Certified</div>
+                <div className="text-xs text-muted">Field-Tested Industrial Standard</div>
               </div>
-              <span className="font-head font-extrabold text-6xl text-white/5 absolute -bottom-4 right-4 select-none">
-                {s.num}
-              </span>
-              <div className="text-sm font-head font-semibold text-ctext mb-1">Comeet Controls Certified</div>
-              <div className="text-xs text-muted">Field-Tested Industrial Standard</div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </section>
 
       {/* Project Execution Lifecycle */}

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Stats from "@/components/Stats";
+import { getJourney, initDB } from "@/lib/db";
 
 export const metadata = {
   title: "About Us | Comeet Controls Pvt. Ltd. - Industrial Automation Pune",
@@ -30,29 +31,6 @@ const values = [
   },
 ];
 
-const timeline = [
-  {
-    year: "2012",
-    title: "Founding of CES",
-    desc: "Established as Comeet Engineering Services (CES) in Pune, delivering specialized PLC programming and electrical control panels.",
-  },
-  {
-    year: "2016",
-    title: "Turnkey SPM Manufacturing",
-    desc: "Expanded into turnkey Special Purpose Machines (SPMs), rewinding lines, and automotive component testing rigs.",
-  },
-  {
-    year: "2020",
-    title: "Incorporation as Pvt. Ltd.",
-    desc: "Transitioned to Comeet Controls Pvt. Ltd., scaling manufacturing capacity, engineering team, and serving global clients.",
-  },
-  {
-    year: "Present",
-    title: "Industry 4.0 & NVH Systems",
-    desc: "Pioneering cloud SCADA integration, smart sensor arrays, and advanced NVH acoustic/vibration defect detection.",
-  },
-];
-
 const techStack = [
   { category: "PLC & Controllers", items: ["Siemens S7-1200/1500", "Allen Bradley MicroLogix/ControlLogix", "Mitsubishi FX/iQ-R", "Delta DVP/AS", "Schneider M221/M241"] },
   { category: "HMI & SCADA", items: ["Siemens WinCC / Comfort Panels", "Ignition SCADA", "Rockwell FactoryTalk", "Pro-face", "Wonderware InTouch"] },
@@ -60,7 +38,24 @@ const techStack = [
   { category: "Design & CAD", items: ["EPLAN Electric P8", "SolidWorks 3D Modeling", "AutoCAD Electrical", "Thermal Calculation Tools"] },
 ];
 
-export default function AboutPage() {
+const DEFAULT_JOURNEY = [
+  { id: 1, year: "2012",    title: "Founding of CES",             description: "Established as Comeet Engineering Services (CES) in Pune, delivering specialized PLC programming and electrical control panels." },
+  { id: 2, year: "2016",    title: "Turnkey SPM Manufacturing",   description: "Expanded into turnkey Special Purpose Machines (SPMs), rewinding lines, and automotive component testing rigs." },
+  { id: 3, year: "2020",    title: "Incorporation as Pvt. Ltd.",  description: "Transitioned to Comeet Controls Pvt. Ltd., scaling manufacturing capacity, engineering team, and serving global clients." },
+  { id: 4, year: "Present", title: "Industry 4.0 & NVH Systems", description: "Pioneering cloud SCADA integration, smart sensor arrays, and advanced NVH acoustic/vibration defect detection." },
+];
+
+export default async function AboutPage() {
+  let timeline = DEFAULT_JOURNEY;
+  try {
+    await initDB();
+    const rows = await getJourney();
+    if (rows && rows.length > 0) timeline = rows;
+  } catch {
+    // DB not available — use defaults
+  }
+
+
   return (
     <div className="pt-8 pb-24">
       {/* Header Banner */}
@@ -199,7 +194,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Timeline Section */}
+      {/* Timeline Section — driven by CMS data */}
       <section className="py-24 bg-bg2 border-t border-accent/10">
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-16">
@@ -214,7 +209,7 @@ export default function AboutPage() {
           <div className="space-y-8 relative before:absolute before:inset-0 before:left-5 md:before:left-1/2 before:w-0.5 before:bg-accent/20">
             {timeline.map((item, idx) => (
               <div
-                key={item.year}
+                key={item.id ?? item.year}
                 className={`relative flex flex-col md:flex-row items-start gap-8 ${
                   idx % 2 === 0 ? "md:flex-row-reverse" : ""
                 }`}
@@ -225,7 +220,7 @@ export default function AboutPage() {
                       {item.year}
                     </span>
                     <h3 className="font-head font-bold text-lg text-ctext mt-3 mb-2">{item.title}</h3>
-                    <p className="text-muted text-sm leading-relaxed">{item.desc}</p>
+                    <p className="text-muted text-sm leading-relaxed">{item.description || item.desc}</p>
                   </div>
                 </div>
                 <div className="absolute left-3.5 md:left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-accent border-4 border-bg shadow-[0_0_12px_#00b4ff]" />

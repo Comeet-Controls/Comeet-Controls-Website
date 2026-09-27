@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+Allow: /about
+Allow: /services
+Allow: /projects
+Allow: /quality
+Allow: /contact
+
+# Block admin panel from search engine indexing
+Disallow: /admin
+Disallow: /admin/
+
+# Block all API routes from search engine indexing
+Disallow: /api/
+
+Sitemap: https://www.comeetindia.com/sitemap.xml

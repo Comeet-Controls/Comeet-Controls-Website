@@ -121,7 +121,7 @@ export async function POST(request) {
 
     const recipient = process.env.CONTACT_RECIPIENT || "sales@comeetindia.com";
 
-    // 7. Send Email
+    // 7. Send Inquiry Email to Comeet Sales Team
     await transporter.sendMail({
       from: `"Comeet Controls Portal" <${process.env.GMAIL_USER}>`,
       to: recipient,
@@ -174,7 +174,53 @@ export async function POST(request) {
       `,
     });
 
+    // 8. Send Auto-Reply Confirmation to Submitter
+    await transporter.sendMail({
+      from: `"Comeet Controls Pvt. Ltd." <${process.env.GMAIL_USER}>`,
+      to: email.trim(),
+      subject: `We received your inquiry — Comeet Controls Pvt. Ltd.`,
+      html: `
+        <div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f8fafc;padding:24px;border-radius:12px;border:1px solid #e2e8f0;">
+          <div style="background:linear-gradient(135deg,#0066ff,#00b4ff);padding:28px 24px;border-radius:8px;text-align:center;color:#ffffff;">
+            <h1 style="margin:0;font-size:20px;letter-spacing:-0.5px;">Thank You, ${safeName}!</h1>
+            <p style="margin:8px 0 0;opacity:0.9;font-size:13px;">Your inquiry has been received by our engineering team.</p>
+          </div>
+
+          <div style="background:#ffffff;padding:28px;border-radius:8px;margin-top:16px;box-shadow:0 2px 4px rgba(0,0,0,0.04);">
+            <p style="font-size:14px;color:#334155;line-height:1.7;margin-top:0;">
+              We have received your technical inquiry regarding <strong>${safeService}</strong>. Our senior engineer will review your requirements and respond within <strong>24 working hours</strong> (Mon–Sat, 9 AM – 6 PM IST).
+            </p>
+
+            <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:16px 20px;margin:20px 0;font-size:13px;color:#0369a1;">
+              <strong>Your Inquiry Summary</strong><br/>
+              <span style="color:#334155;">Service: ${safeService}</span><br/>
+              <span style="color:#334155;">Timeline: ${safeBudget || "Not specified"}</span>
+            </div>
+
+            <p style="font-size:13px;color:#64748b;line-height:1.6;">
+              If your requirement is <strong>urgent</strong>, please call or WhatsApp us directly:
+            </p>
+            <p style="text-align:center;margin:16px 0;">
+              <a href="tel:+919960194497" style="display:inline-block;background:linear-gradient(135deg,#0066ff,#00b4ff);color:#ffffff;font-weight:600;font-size:15px;text-decoration:none;padding:12px 28px;border-radius:30px;">
+                📞 +91 99601 94497
+              </a>
+            </p>
+
+            <hr style="border:none;border-top:1px solid #e2e8f0;margin:20px 0;" />
+            <p style="font-size:12px;color:#94a3b8;margin:0;line-height:1.6;">
+              <strong style="color:#334155;">Comeet Controls Pvt. Ltd.</strong><br/>
+              709, Sukhwani Fairview, Near Aditya Birla Hospital,<br/>
+              Thergaon, Chinchwad, Pune – 411033, Maharashtra<br/>
+              <a href="mailto:sales@comeetindia.com" style="color:#0066ff;text-decoration:none;">sales@comeetindia.com</a> · 
+              <a href="https://www.comeetindia.com" style="color:#0066ff;text-decoration:none;">www.comeetindia.com</a>
+            </p>
+          </div>
+        </div>
+      `,
+    });
+
     return NextResponse.json({ success: true });
+
   } catch (error) {
     console.error("Contact API Server Error:", error);
     return NextResponse.json(

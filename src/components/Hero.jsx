@@ -2,9 +2,29 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
+const FALLBACK_STATS = [
+  { val: "75+",  label: "Happy Clients"      },
+  { val: "50+",  label: "Projects Delivered" },
+  { val: "100%", label: "FAT Clearance"      },
+];
+
 export default function Hero() {
   const canvasRef = useRef(null);
   const [showTop, setShowTop] = useState(false);
+  const [heroStats, setHeroStats] = useState(FALLBACK_STATS);
+
+  useEffect(() => {
+    fetch("/api/data/stats")
+      .then((r) => r.json())
+      .then((d) => {
+        if (Array.isArray(d) && d.length >= 1) {
+          setHeroStats(
+            d.slice(0, 3).map((s) => ({ val: `${s.value}${s.suffix}`, label: s.label }))
+          );
+        }
+      })
+      .catch(() => {}); // keep fallback on error
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setShowTop(window.scrollY > 400);
@@ -77,9 +97,9 @@ export default function Hero() {
   }, []);
 
   const stats = [
-    { val: "75+", label: "Happy Clients"    },
-    { val: "50+", label: "Projects Done"    },
-    { val: "10+", label: "Expert Engineers" },
+    { val: "75+",  label: "Happy Clients"      },
+    { val: "50+",  label: "Projects Delivered" },
+    { val: "100%", label: "FAT Clearance"      },
   ];
 
   return (
@@ -127,7 +147,7 @@ export default function Hero() {
 
       {/* Stat cards — hidden on mobile */}
       <div className="absolute right-[8%] top-1/2 -translate-y-1/2 z-10 hidden lg:flex flex-col gap-4">
-        {stats.map((s) => (
+        {heroStats.map((s) => (
           <div
             key={s.label}
             className="relative overflow-hidden bg-surface/85 border border-accent/15 rounded-xl px-7 py-5 backdrop-blur-xl transition-all hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,0,0,0.3)]"
