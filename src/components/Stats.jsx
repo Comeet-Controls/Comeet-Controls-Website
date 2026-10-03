@@ -27,6 +27,18 @@ function SkeletonCard() {
   );
 }
 
+// Fallback data — shown if DB/API is unreachable. Matches seed defaults in db.js.
+const FALLBACK_STATS = [
+  { id: 1, icon: "fa-face-smile",        value: 75,  suffix: "+",  label: "Happy Clients" },
+  { id: 2, icon: "fa-diagram-project",   value: 50,  suffix: "+",  label: "Projects Done" },
+  { id: 3, icon: "fa-users",             value: 10,  suffix: "+",  label: "Expert Engineers" },
+  { id: 4, icon: "fa-calendar-check",    value: 12,  suffix: "+",  label: "Years Experience" },
+  { id: 5, icon: "fa-boxes-stacked",     value: 50,  suffix: "+",  label: "Total Projects Delivered" },
+  { id: 6, icon: "fa-clock-rotate-left", value: 98,  suffix: "%",  label: "On-Time Commissioning" },
+  { id: 7, icon: "fa-circle-check",      value: 100, suffix: "%",  label: "FAT Clearance on 1st Run" },
+  { id: 8, icon: "fa-headset",           value: 24,  suffix: "/7", label: "Post-Handover Support" },
+];
+
 export default function Stats() {
   const ref = useRef(null);
   const [started, setStarted] = useState(false);
@@ -38,10 +50,19 @@ export default function Stats() {
     fetch("/api/data/stats")
       .then((r) => r.json())
       .then((d) => {
-        if (Array.isArray(d)) setData(d);
+        if (Array.isArray(d) && d.length > 0) {
+          setData(d);
+        } else {
+          // API returned empty array or error object — use fallback
+          setData(FALLBACK_STATS);
+        }
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => {
+        // Network or API failure — silently fall back so page never goes blank
+        setData(FALLBACK_STATS);
+        setLoading(false);
+      });
   }, []);
 
   // Counter animation trigger on scroll
