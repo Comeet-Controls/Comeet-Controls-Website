@@ -1,6 +1,8 @@
 import { getProjects, initDB } from "@/lib/db";
 import ProjectsClient from "./ProjectsClient";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Projects & Case Studies | Comeet Controls Pvt. Ltd.",
   description:

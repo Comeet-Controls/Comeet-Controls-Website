@@ -2,6 +2,8 @@ import Link from "next/link";
 import Stats from "@/components/Stats";
 import { getJourney, initDB } from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "About Us | Comeet Controls Pvt. Ltd. - Industrial Automation Pune",
   description:

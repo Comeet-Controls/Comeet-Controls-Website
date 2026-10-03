@@ -3,6 +3,9 @@ import Hero from "@/components/Hero";
 import Marquee from "@/components/Marquee";
 import Stats from "@/components/Stats";
 
+export const dynamic = "force-dynamic";
+
+
 const featuredServices = [
   {
     num: "01",
