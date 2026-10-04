@@ -2,63 +2,41 @@ import Link from "next/link";
 import Hero from "@/components/Hero";
 import Marquee from "@/components/Marquee";
 import Stats from "@/components/Stats";
+import { getServices, getProjects, initDB } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
-
-const featuredServices = [
-  {
-    num: "01",
-    icon: "fa-gears",
-    cls: "bg-accent2/15 text-accent2",
-    title: "Special Purpose Machines (SPMs)",
-    desc: "Turnkey custom automation machinery — design, mechanical fabrication, sensor integration, PLC logic, and site commissioning.",
-  },
-  {
-    num: "02",
-    icon: "fa-microchip",
-    cls: "bg-accent/15 text-accent",
-    title: "PLC & HMI Programming",
-    desc: "Robust automation software across Siemens, Allen Bradley, Mitsubishi, and Delta platforms with intuitive operator interfaces.",
-  },
-  {
-    num: "03",
-    icon: "fa-display",
-    cls: "bg-[#00c8a0]/15 text-[#00c8a0]",
-    title: "SCADA & Industrial IoT",
-    desc: "Centralized telemetry, real-time plant data logging, predictive alarm handling, and Industry 4.0 cloud connectivity.",
-  },
-  {
-    num: "04",
-    icon: "fa-bolt",
-    cls: "bg-[#9650ff]/15 text-[#9650ff]",
-    title: "Electrical Control Panels",
-    desc: "Engineered PCC, MCC, and VFD panels designed to IP55/65 standards with certified wiring and thermal protection.",
-  },
+// Fallback data shown if DB is unreachable
+const FALLBACK_SERVICES = [
+  { id: 1, num: "01", icon: "fa-gears",     cls: "bg-accent2/15 text-accent2",    title: "Special Purpose Machines (SPMs)",  description: "Turnkey custom automation machinery — design, mechanical fabrication, sensor integration, PLC logic, and site commissioning." },
+  { id: 2, num: "02", icon: "fa-microchip", cls: "bg-accent/15 text-accent",      title: "PLC & HMI Programming",            description: "Robust automation software across Siemens, Allen Bradley, Mitsubishi, and Delta platforms with intuitive operator interfaces." },
+  { id: 3, num: "03", icon: "fa-display",   cls: "bg-[#00c8a0]/15 text-[#00c8a0]",title: "SCADA & Industrial IoT",           description: "Centralized telemetry, real-time plant data logging, predictive alarm handling, and Industry 4.0 cloud connectivity." },
+  { id: 4, num: "04", icon: "fa-bolt",      cls: "bg-[#9650ff]/15 text-[#9650ff]",title: "Electrical Control Panels",        description: "Engineered PCC, MCC, and VFD panels designed to IP55/65 standards with certified wiring and thermal protection." },
 ];
 
-const featuredProjects = [
-  {
-    tag: "Automotive Rig",
-    icon: "fa-gear",
-    title: "Transmission Test Rig",
-    desc: "High-precision automated rig testing torque, gear transitions, and vibration defects prior to vehicle assembly.",
-  },
-  {
-    tag: "Packaging Line",
-    icon: "fa-rotate",
-    title: "High-Speed Rewinding Line",
-    desc: "Automated multi-material rewinding system with closed-loop tension control for paper, foil, and steel coils.",
-  },
-  {
-    tag: "Quality Control",
-    icon: "fa-wave-square",
-    title: "NVH System Integration",
-    desc: "Acoustic and vibration monitoring system that detects micro-defects using reference FFT frequency analysis.",
-  },
+const FALLBACK_PROJECTS = [
+  { id: 1, tag: "Automotive Rig",  icon: "fa-gear",        title: "Transmission Test Rig",    short_desc: "High-precision automated rig testing torque, gear transitions, and vibration defects prior to vehicle assembly." },
+  { id: 2, tag: "Packaging Line",  icon: "fa-rotate",      title: "High-Speed Rewinding Line", short_desc: "Automated multi-material rewinding system with closed-loop tension control for paper, foil, and steel coils." },
+  { id: 3, tag: "Quality Control", icon: "fa-wave-square", title: "NVH System Integration",    short_desc: "Acoustic and vibration monitoring system that detects micro-defects using reference FFT frequency analysis." },
 ];
 
-export default function Home() {
+export default async function Home() {
+  // Fetch live data from Neon DB — falls back gracefully if DB is unavailable
+  let featuredServices = FALLBACK_SERVICES;
+  let featuredProjects = FALLBACK_PROJECTS;
+
+  try {
+    await initDB();
+    const [allServices, allProjects] = await Promise.all([
+      getServices(),
+      getProjects(),
+    ]);
+    if (allServices.length > 0) featuredServices = allServices.slice(0, 4);
+    if (allProjects.length > 0) featuredProjects = allProjects.slice(0, 3);
+  } catch (e) {
+    console.error("Homepage DB fetch failed, using fallback:", e.message);
+  }
+
   return (
     <>
       {/* 1. Hero Section */}
@@ -134,7 +112,7 @@ export default function Home() {
       {/* 4. Animated Stats Bar */}
       <Stats />
 
-      {/* 5. Services Overview */}
+      {/* 5. Services Overview — live from CMS */}
       <section className="py-24 bg-bg2 border-b border-accent/10">
         <div className="max-w-6xl mx-auto px-6">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
@@ -150,14 +128,14 @@ export default function Home() {
               href="/services"
               className="inline-flex items-center gap-2 text-accent text-sm font-semibold hover:gap-3 transition-all"
             >
-              View All 6 Services &amp; Tech Specs <i className="fas fa-arrow-right text-xs" />
+              View All Services &amp; Tech Specs <i className="fas fa-arrow-right text-xs" />
             </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-7">
             {featuredServices.map((s) => (
               <div
-                key={s.num}
+                key={s.id ?? s.num}
                 className="relative overflow-hidden bg-surface border border-accent/15 rounded-2xl p-8 card-hover group"
               >
                 <div className="flex items-start justify-between mb-6">
@@ -167,7 +145,7 @@ export default function Home() {
                   <span className="font-head text-3xl font-bold text-white/5">{s.num}</span>
                 </div>
                 <h3 className="font-head font-bold text-xl mb-3">{s.title}</h3>
-                <p className="text-muted text-sm leading-relaxed mb-6">{s.desc}</p>
+                <p className="text-muted text-sm leading-relaxed mb-6">{s.description || s.desc}</p>
                 <Link
                   href="/services"
                   className="inline-flex items-center gap-2 text-accent text-xs font-semibold hover:underline"
@@ -180,7 +158,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 6. Featured Projects Showcase */}
+      {/* 6. Featured Projects Showcase — live from CMS */}
       <section className="py-24 bg-bg border-b border-accent/10">
         <div className="max-w-6xl mx-auto px-6">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
@@ -203,7 +181,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {featuredProjects.map((p) => (
               <div
-                key={p.title}
+                key={p.id ?? p.title}
                 className="bg-surface border border-accent/15 rounded-2xl p-7 card-hover flex flex-col justify-between"
               >
                 <div>
@@ -214,7 +192,7 @@ export default function Home() {
                     <i className={`fas ${p.icon} text-muted/40 text-xl`} />
                   </div>
                   <h3 className="font-head font-bold text-lg mb-3">{p.title}</h3>
-                  <p className="text-muted text-sm leading-relaxed mb-6">{p.desc}</p>
+                  <p className="text-muted text-sm leading-relaxed mb-6">{p.short_desc || p.desc}</p>
                 </div>
                 <Link
                   href="/projects"

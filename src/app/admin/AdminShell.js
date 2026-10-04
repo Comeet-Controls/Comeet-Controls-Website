@@ -120,6 +120,15 @@ export default function AdminShell({ children, title }) {
           </Link>
         </header>
 
+        {/* Mobile warning banner */}
+        <div
+          className="lg:hidden flex items-center gap-3 px-4 py-3 text-xs font-medium border-b"
+          style={{ background: "rgba(255,180,0,0.08)", borderColor: "rgba(255,180,0,0.2)", color: "#f59e0b" }}
+        >
+          <i className="fas fa-triangle-exclamation flex-shrink-0" />
+          Admin panel is optimised for desktop. Some tables may be cut off on mobile screens.
+        </div>
+
         {/* Page content */}
         <main className="flex-1 p-6 overflow-auto">{children}</main>
       </div>

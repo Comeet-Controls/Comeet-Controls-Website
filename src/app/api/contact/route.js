@@ -1,34 +1,53 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import { neon } from "@neondatabase/serverless";
 
-// In-memory sliding-window rate limiter per IP address
-// Default: Max 5 inquiries per IP every 15 minutes
-const rateLimitMap = new Map();
-const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
-const MAX_REQUESTS_PER_WINDOW = 5;
+// ---------------------------------------------------------------------------
+// DB-backed rate limiter — works across all Vercel serverless instances.
+// In-memory Maps don't work in serverless because each request can land on
+// a different container. Using the DB ensures the limit is truly global.
+// ---------------------------------------------------------------------------
+async function checkRateLimit(ip) {
+  const sql = neon(process.env.DATABASE_URL);
+  const WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+  const MAX = 5;
 
-function checkRateLimit(ip) {
-  const now = Date.now();
+  try {
+    // Ensure rate limit table exists
+    await sql`
+      CREATE TABLE IF NOT EXISTS rate_limits (
+        ip VARCHAR(64) PRIMARY KEY,
+        count INTEGER NOT NULL DEFAULT 1,
+        expires_at BIGINT NOT NULL
+      )
+    `;
 
-  // Housekeeping: purge expired IPs if map grows large
-  if (rateLimitMap.size > 2000) {
-    for (const [key, val] of rateLimitMap.entries()) {
-      if (val.expiresAt < now) rateLimitMap.delete(key);
-    }
+    const now = Date.now();
+    const expiresAt = now + WINDOW_MS;
+
+    // Upsert: if IP exists and window is still valid, increment count.
+    // If window expired, reset it.
+    const rows = await sql`
+      INSERT INTO rate_limits (ip, count, expires_at)
+      VALUES (${ip}, 1, ${expiresAt})
+      ON CONFLICT (ip) DO UPDATE SET
+        count = CASE
+          WHEN rate_limits.expires_at < ${now} THEN 1
+          ELSE rate_limits.count + 1
+        END,
+        expires_at = CASE
+          WHEN rate_limits.expires_at < ${now} THEN ${expiresAt}
+          ELSE rate_limits.expires_at
+        END
+      RETURNING count, expires_at
+    `;
+
+    const count = rows[0]?.count ?? 1;
+    return { limited: count > MAX, remaining: Math.max(0, MAX - count) };
+  } catch {
+    // If DB rate limit check fails, allow the request (fail open)
+    return { limited: false, remaining: MAX };
   }
-
-  const record = rateLimitMap.get(ip);
-  if (!record || record.expiresAt < now) {
-    rateLimitMap.set(ip, { count: 1, expiresAt: now + RATE_LIMIT_WINDOW_MS });
-    return { limited: false, remaining: MAX_REQUESTS_PER_WINDOW - 1 };
-  }
-
-  if (record.count >= MAX_REQUESTS_PER_WINDOW) {
-    return { limited: true, remaining: 0 };
-  }
-
-  record.count += 1;
-  return { limited: false, remaining: MAX_REQUESTS_PER_WINDOW - record.count };
 }
 
 export async function POST(request) {
