@@ -18,17 +18,15 @@ function sql(strings, ...values) {
   return _sql(strings, ...values);
 }
 
-// Module-level promise — resolves once per process lifetime (serverless safe)
-let _initPromise = null;
-
-export function initDB() {
-  if (_initPromise) return _initPromise;
-  _initPromise = _doInit().catch((err) => {
-    // Reset on failure so next request retries
-    _initPromise = null;
-    throw err;
-  });
-  return _initPromise;
+// ---------------------------------------------------------------------------
+// initDB — runs schema creation/migration on every cold start.
+// In Vercel serverless each request may be a fresh instance, so we do NOT
+// cache the promise at module level — that would prevent fresh reads.
+// The CREATE TABLE IF NOT EXISTS and ALTER TABLE IF NOT EXISTS statements
+// are idempotent so running them on every cold start is safe.
+// ---------------------------------------------------------------------------
+export async function initDB() {
+  await _doInit();
 }
 
 async function _doInit() {
