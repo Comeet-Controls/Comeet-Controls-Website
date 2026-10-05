@@ -369,7 +369,7 @@ export default function ContactPage() {
           <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-bg/80 to-transparent z-10 pointer-events-none" />
           <iframe
             title="Comeet Controls Pvt. Ltd. — Pune Location"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3781.3765055685253!2d73.78649931489!3d18.655148987368!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTjCsDM5JzE4LjUiTiA3M8KwNDcnMTEuNCJF!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
+            src="https://maps.google.com/maps?q=Sukhwani%20Fairview,%20Thergaon,%20Pune&t=&z=15&ie=UTF8&iwloc=&output=embed"
             className="w-full h-[420px] border-0 block"
             allowFullScreen={true}
             loading="lazy"
