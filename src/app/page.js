@@ -4,7 +4,7 @@ import Marquee from "@/components/Marquee";
 import Stats from "@/components/Stats";
 import { getServices, getProjects, initDB } from "@/lib/db";
 
-export const dynamic = "force-dynamic";
+export const revalidate = false;
 
 // Fallback data shown if DB is unreachable
 const FALLBACK_SERVICES = [
@@ -210,7 +210,7 @@ export default async function Home() {
       <section className="py-20 relative overflow-hidden" style={{ background: "linear-gradient(135deg,#061525 0%,#0d2035 100%)" }}>
         <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
           <div className="inline-flex items-center gap-2 text-accent text-xs font-semibold uppercase tracking-widest mb-4 bg-accent/10 border border-accent/20 px-4 py-1.5 rounded-full">
-            Ready To Upgrade Your Plant?
+            Ready to Upgrade Your Plant?
           </div>
           <h2 className="font-head text-3xl md:text-5xl font-bold mb-6">
             Let&apos;s Design Your Custom Automation Solution

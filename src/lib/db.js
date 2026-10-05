@@ -13,11 +13,7 @@ function sql(strings, ...values) {
         "DATABASE_URL is not set. Add it to .env.local (local) or Vercel Environment Variables (production)."
       );
     }
-    _sql = neon(process.env.DATABASE_URL, {
-      fetchOptions: {
-        cache: "no-store",
-      },
-    });
+    _sql = neon(process.env.DATABASE_URL);
   }
   return _sql(strings, ...values);
 }

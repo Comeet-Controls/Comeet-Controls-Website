@@ -41,7 +41,7 @@ const faqs = [
     a: "Yes. We have commissioned machines and control panels across Maharashtra, Gujarat, Tamil Nadu, Karnataka, and northern industrial belts, as well as overseas installations.",
   },
   {
-    q: "Can you retrofit and upgrade our legacy existing machines?",
+    q: "Can you retrofit and upgrade our existing legacy machines?",
     a: "Absolutely. We specialize in upgrading obsolete controllers (e.g., legacy Siemens S5 or older Omron PLCs) to modern Siemens S7-1500 or Rockwell CompactLogix with new touch HMIs and safety interlocks.",
   },
   {
@@ -108,7 +108,7 @@ export default function ContactPage() {
             <span className="gradient-text">Our Engineering Team</span>
           </h1>
           <p className="text-muted text-lg max-w-2xl leading-relaxed">
-            Whether you have a specific machine specification, need an electrical panel quote, or require emergency on-site
+            Whether you have a specific machine requirement, need an electrical panel quote, or require emergency on-site
             automation support, our engineers in Chinchwad, Pune are ready to assist.
           </p>
         </div>
@@ -369,7 +369,7 @@ export default function ContactPage() {
           <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-bg/80 to-transparent z-10 pointer-events-none" />
           <iframe
             title="Comeet Controls Pvt. Ltd. — Pune Location"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3781.3765055685253!2d73.78649931489!3d18.655148987368!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc2b9e12ad7e3ef%3A0x4b4c6e9c6f0b2d45!2sSukhwani%20Fairview%2C%20Thergaon%2C%20Pimpri-Chinchwad%2C%20Maharashtra%20411033!5e0!3m2!1sen!2sin!4v1680000000000!5m2!1sen!2sin"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3781.3765055685253!2d73.78649931489!3d18.655148987368!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTjCsDM5JzE4LjUiTiA3M8KwNDcnMTEuNCJF!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
             className="w-full h-[420px] border-0 block"
             allowFullScreen={true}
             loading="lazy"

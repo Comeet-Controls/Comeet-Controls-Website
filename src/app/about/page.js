@@ -2,7 +2,7 @@ import Link from "next/link";
 import Stats from "@/components/Stats";
 import { getJourney, initDB } from "@/lib/db";
 
-export const dynamic = "force-dynamic";
+export const revalidate = false;
 
 export const metadata = {
   title: "About Us | Comeet Controls Pvt. Ltd. - Industrial Automation Pune",
@@ -173,7 +173,7 @@ export default async function AboutPage() {
             Hardware &amp; Platforms
           </div>
           <h2 className="font-head text-3xl md:text-4xl font-bold">
-            Industry Standard <span className="gradient-text">Technologies</span>
+            Industry-Standard <span className="gradient-text">Technologies</span>
           </h2>
           <p className="text-muted text-sm mt-3">We architect systems using internationally recognized components to ensure lifetime serviceability.</p>
         </div>

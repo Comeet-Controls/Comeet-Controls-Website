@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -46,20 +47,30 @@ export default function Navbar() {
       >
         <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
           {/* Brand Logo */}
-          <Link href="/" className="flex flex-col group">
-            <span
-              className="font-head font-bold text-xl tracking-tight transition-transform duration-300 group-hover:scale-[1.02]"
-              style={{
-                background: "linear-gradient(90deg,#ffffff,#00b4ff)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}
-            >
-              Comeet Controls
-            </span>
-            <span className="text-[0.65rem] text-muted uppercase tracking-widest mt-0.5">
-              Industrial Automation · Pvt. Ltd.
-            </span>
+          <Link href="/" className="flex items-center gap-3 group">
+            <Image
+              src="/logo.png"
+              alt="Comeet Controls Logo"
+              width={44}
+              height={44}
+              className="rounded-lg transition-transform duration-300 group-hover:scale-105"
+              priority
+            />
+            <div className="flex flex-col">
+              <span
+                className="font-head font-bold text-xl tracking-tight transition-transform duration-300 group-hover:scale-[1.02]"
+                style={{
+                  background: "linear-gradient(90deg,#ffffff,#00b4ff)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+              >
+                Comeet Controls
+              </span>
+              <span className="text-[0.65rem] text-muted uppercase tracking-widest mt-0.5">
+                Industrial Automation · Pvt. Ltd.
+              </span>
+            </div>
           </Link>
 
           {/* Desktop Navigation Links */}

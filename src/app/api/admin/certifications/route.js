@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getAdminSession } from "@/lib/auth";
 import { initDB, getCertifications, createCertification, updateCertification, deleteCertification } from "@/lib/db";
 
@@ -40,6 +41,7 @@ export async function POST(request) {
     const validationError = validateCertification(body);
     if (validationError) return NextResponse.json({ error: validationError }, { status: 400 });
     const item = await createCertification(body);
+    revalidatePath("/quality");
     return NextResponse.json(item, { status: 201 });
   } catch {
     return NextResponse.json({ error: "Failed to create certification." }, { status: 500 });
@@ -57,6 +59,7 @@ export async function PUT(request) {
     const validationError = validateCertification(fields);
     if (validationError) return NextResponse.json({ error: validationError }, { status: 400 });
     const item = await updateCertification(id, fields);
+    revalidatePath("/quality");
     return NextResponse.json(item);
   } catch {
     return NextResponse.json({ error: "Failed to update certification." }, { status: 500 });
@@ -72,6 +75,7 @@ export async function DELETE(request) {
     const id = searchParams.get("id");
     if (!id || isNaN(Number(id))) return NextResponse.json({ error: "Valid id required." }, { status: 400 });
     await deleteCertification(id);
+    revalidatePath("/quality");
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ error: "Failed to delete certification." }, { status: 500 });

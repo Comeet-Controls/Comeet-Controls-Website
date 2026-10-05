@@ -1,7 +1,7 @@
 import { getProjects, initDB } from "@/lib/db";
 import ProjectsClient from "./ProjectsClient";
 
-export const dynamic = "force-dynamic";
+export const revalidate = false;
 
 export const metadata = {
   title: "Projects & Case Studies | Comeet Controls Pvt. Ltd.",
@@ -86,7 +86,7 @@ const DEFAULT_PROJECTS = [
     hardware: "Siemens S7-1200 PLC, High-Pressure Flow Meters, Proportional Pressure Valves",
     challenge: "Validating flow rate vs pressure characteristics across full operating temperature ranges.",
     solution: "Fully enclosed hydraulic test cell with automated oil temperature conditioning.",
-    result: "Automated 12-minute test cycle down to 3 minutes with signed PDF inspection certificates.",
+    result: "Reduced 12-minute test cycle to 3 minutes with signed PDF inspection certificates.",
     specs: [],
     badge: "Hydraulics Rig",
   },

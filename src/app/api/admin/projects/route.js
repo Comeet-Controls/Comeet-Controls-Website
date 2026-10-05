@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getAdminSession } from "@/lib/auth";
 import { initDB, getProjects, createProject, updateProject, deleteProject } from "@/lib/db";
 
@@ -40,6 +41,8 @@ export async function POST(request) {
     const validationError = validateProject(body);
     if (validationError) return NextResponse.json({ error: validationError }, { status: 400 });
     const item = await createProject(body);
+    revalidatePath("/");
+    revalidatePath("/projects");
     return NextResponse.json(item, { status: 201 });
   } catch {
     return NextResponse.json({ error: "Failed to create project." }, { status: 500 });
@@ -57,6 +60,8 @@ export async function PUT(request) {
     const validationError = validateProject(fields);
     if (validationError) return NextResponse.json({ error: validationError }, { status: 400 });
     const item = await updateProject(id, fields);
+    revalidatePath("/");
+    revalidatePath("/projects");
     return NextResponse.json(item);
   } catch {
     return NextResponse.json({ error: "Failed to update project." }, { status: 500 });
@@ -72,6 +77,8 @@ export async function DELETE(request) {
     const id = searchParams.get("id");
     if (!id || isNaN(Number(id))) return NextResponse.json({ error: "Valid id required." }, { status: 400 });
     await deleteProject(id);
+    revalidatePath("/");
+    revalidatePath("/projects");
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ error: "Failed to delete project." }, { status: 500 });

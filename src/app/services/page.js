@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getServices, initDB } from "@/lib/db";
 
-export const dynamic = "force-dynamic";
+export const revalidate = false;
 
 export const metadata = {
   title: "Services & Capabilities | Comeet Controls Pvt. Ltd. - Industrial Automation Pune",

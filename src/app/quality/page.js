@@ -31,7 +31,7 @@ const pillars = [
   {
     icon: "fa-temperature-high",
     title: "FLIR Thermal Imaging & Heat Analysis",
-    desc: "Control panels with high-power VFDs and servo amplifiers are scanned using FLIR infrared thermal cameras under load to detect terminal loose connections and ensure airflow dissipation.",
+    desc: "Control panels with high-power VFDs and servo amplifiers are scanned using FLIR infrared thermal cameras under load to detect loose terminal connections and ensure airflow dissipation.",
   },
   {
     icon: "fa-file-shield",

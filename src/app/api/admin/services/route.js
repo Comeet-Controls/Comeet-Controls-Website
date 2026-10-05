@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getAdminSession } from "@/lib/auth";
 import { initDB, getServices, createService, updateService, deleteService } from "@/lib/db";
 
@@ -38,6 +39,8 @@ export async function POST(request) {
     const validationError = validateService(body);
     if (validationError) return NextResponse.json({ error: validationError }, { status: 400 });
     const item = await createService(body);
+    revalidatePath("/");
+    revalidatePath("/services");
     return NextResponse.json(item, { status: 201 });
   } catch {
     return NextResponse.json({ error: "Failed to create service." }, { status: 500 });
@@ -55,6 +58,8 @@ export async function PUT(request) {
     const validationError = validateService(fields);
     if (validationError) return NextResponse.json({ error: validationError }, { status: 400 });
     const item = await updateService(id, fields);
+    revalidatePath("/");
+    revalidatePath("/services");
     return NextResponse.json(item);
   } catch {
     return NextResponse.json({ error: "Failed to update service." }, { status: 500 });
@@ -70,6 +75,8 @@ export async function DELETE(request) {
     const id = searchParams.get("id");
     if (!id || isNaN(Number(id))) return NextResponse.json({ error: "Valid id required." }, { status: 400 });
     await deleteService(id);
+    revalidatePath("/");
+    revalidatePath("/services");
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ error: "Failed to delete service." }, { status: 500 });

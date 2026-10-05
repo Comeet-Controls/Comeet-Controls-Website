@@ -2,6 +2,7 @@
 // Shared auth check helper for all admin API routes
 // ---------------------------------------------------------------------------
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getAdminSession } from "@/lib/auth";
 import { initDB, getStats, createStat, updateStat, deleteStat } from "@/lib/db";
 
@@ -49,6 +50,8 @@ export async function POST(request) {
     const validationError = validateStat(body);
     if (validationError) return NextResponse.json({ error: validationError }, { status: 400 });
     const item = await createStat(body);
+    revalidatePath("/");
+    revalidatePath("/about");
     return NextResponse.json(item, { status: 201 });
   } catch {
     return NextResponse.json({ error: "Failed to create stat." }, { status: 500 });
@@ -66,6 +69,8 @@ export async function PUT(request) {
     const validationError = validateStat(fields);
     if (validationError) return NextResponse.json({ error: validationError }, { status: 400 });
     const item = await updateStat(id, fields);
+    revalidatePath("/");
+    revalidatePath("/about");
     return NextResponse.json(item);
   } catch {
     return NextResponse.json({ error: "Failed to update stat." }, { status: 500 });
@@ -81,6 +86,8 @@ export async function DELETE(request) {
     const id = searchParams.get("id");
     if (!id || isNaN(Number(id))) return NextResponse.json({ error: "Valid id required." }, { status: 400 });
     await deleteStat(id);
+    revalidatePath("/");
+    revalidatePath("/about");
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ error: "Failed to delete stat." }, { status: 500 });
