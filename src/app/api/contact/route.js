@@ -59,7 +59,7 @@ export async function POST(request) {
       : request.headers.get("x-real-ip") || "127.0.0.1";
 
     // 2. IP Rate Limit Check
-    const { limited } = checkRateLimit(ip);
+    const { limited } = await checkRateLimit(ip);
     if (limited) {
       return NextResponse.json(
         {
@@ -140,7 +140,18 @@ export async function POST(request) {
 
     const recipient = process.env.CONTACT_RECIPIENT || "sales@comeetindia.com";
 
-    // 7. Send Inquiry Email to Comeet Sales Team
+    // 8. Verify SMTP connection before sending
+    try {
+      await transporter.verify();
+    } catch (verifyError) {
+      console.error("SMTP Authentication Error:", verifyError);
+      return NextResponse.json(
+        { error: `Email server authentication failed: ${verifyError.message}. Please check GMAIL_USER and GMAIL_APP_PASSWORD in Vercel.` },
+        { status: 500 }
+      );
+    }
+
+    // 9. Send Inquiry Email to Comeet Sales Team
     await transporter.sendMail({
       from: `"Comeet Controls Portal" <${process.env.GMAIL_USER}>`,
       to: recipient,
@@ -193,7 +204,7 @@ export async function POST(request) {
       `,
     });
 
-    // 8. Send Auto-Reply Confirmation to Submitter
+    // 10. Send Auto-Reply Confirmation to Submitter
     await transporter.sendMail({
       from: `"Comeet Controls Pvt. Ltd." <${process.env.GMAIL_USER}>`,
       to: email.trim(),
@@ -243,7 +254,7 @@ export async function POST(request) {
   } catch (error) {
     console.error("Contact API Server Error:", error);
     return NextResponse.json(
-      { error: "Failed to process inquiry. Please call us directly at +91 99601 94497." },
+      { error: "Failed to send email. Error: " + (error.message || "Unknown error") },
       { status: 500 }
     );
   }
