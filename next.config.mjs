@@ -55,6 +55,7 @@ const nextConfig = {
               "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com",
               "img-src 'self' data: https: blob:",
               "connect-src 'self' https:",
+              "frame-src 'self' https://www.google.com https://maps.google.com",
               "frame-ancestors 'none'",
               "base-uri 'self'",
               "form-action 'self'",
