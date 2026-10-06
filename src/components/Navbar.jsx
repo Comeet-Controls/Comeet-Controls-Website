@@ -51,8 +51,8 @@ export default function Navbar() {
             <Image
               src="/logo.png"
               alt="Comeet Controls Logo"
-              width={44}
-              height={44}
+              width={56}
+              height={56}
               className="rounded-lg transition-transform duration-300 group-hover:scale-105"
               priority
             />
