@@ -113,7 +113,7 @@ export default function Footer() {
             © {new Date().getFullYear()} <strong className="text-ctext">Comeet Controls Pvt. Ltd.</strong> (formerly CES). All rights reserved.
           </p>
           <div className="flex items-center gap-6 text-xs text-muted">
-            <span>709 Sukhwani Fairview, Thergaon, Chinchwad, Pune 411033</span>
+            <span>Shop No. 34, MIDC Bhosari, T Block, Pimpri-Chinchwad, Pune 411026</span>
             <span className="hidden md:inline-block">·</span>
             <span className="text-accent font-medium">Industry 4.0 Certified</span>
           </div>

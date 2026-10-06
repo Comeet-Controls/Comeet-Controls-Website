@@ -1,13 +1,13 @@
 import Link from "next/link";
 import Stats from "@/components/Stats";
-import { getJourney, initDB } from "@/lib/db";
+import { getJourney, getStats, initDB } from "@/lib/db";
 
 export const revalidate = false;
 
 export const metadata = {
   title: "About Us | Comeet Controls Pvt. Ltd. - Industrial Automation Pune",
   description:
-    "Learn about Comeet Controls Pvt. Ltd. (formerly Comeet Engineering Services - CES). 12+ years of precision industrial automation, SPMs, and panel engineering in Pune.",
+    "Learn about Comeet Controls Pvt. Ltd. (formerly Comeet Engineering Services - CES). 9+ years of precision industrial automation, SPMs, and panel engineering in Pune.",
 };
 
 const values = [
@@ -29,12 +29,12 @@ const values = [
   {
     icon: "fa-microchip",
     title: "Technology Agnostic",
-    desc: "Certified expertise across Siemens, Rockwell Allen Bradley, Mitsubishi, Schneider, Delta, and Omron automation ecosystems.",
+    desc: "Certified expertise across Siemens, Rockwell Allen Bradley, Mitsubishi, Schneider, Delta and Omron automation ecosystems.",
   },
 ];
 
 const techStack = [
-  { category: "PLC & Controllers", items: ["Siemens S7-1200/1500", "Allen Bradley MicroLogix/ControlLogix", "Mitsubishi FX/iQ-R", "Delta DVP/AS", "Schneider M221/M241"] },
+  { category: "PLC & Controllers", items: ["Siemens S7-300/400, S7-1200/1500", "Allen Bradley MicroLogix/ControlLogix", "Mitsubishi FX/iQ-R", "Delta DVP/AS", "Schneider M221/M241"] },
   { category: "HMI & SCADA", items: ["Siemens WinCC / Comfort Panels", "Ignition SCADA", "Rockwell FactoryTalk", "Pro-face", "Wonderware InTouch"] },
   { category: "Motion & Drives", items: ["VFDs (ABB, Siemens, Delta)", "Servo Motors & Drives (Yaskawa, Mitsubishi)", "Pneumatics (Festo, SMC)", "Precision Ball Screws"] },
   { category: "Design & CAD", items: ["EPLAN Electric P8", "SolidWorks 3D Modeling", "AutoCAD Electrical", "Thermal Calculation Tools"] },
@@ -49,14 +49,19 @@ const DEFAULT_JOURNEY = [
 
 export default async function AboutPage() {
   let timeline = DEFAULT_JOURNEY;
+  let statsData = null;
+  
   try {
     await initDB();
-    const rows = await getJourney();
+    const [rows, allStats] = await Promise.all([
+      getJourney(),
+      getStats()
+    ]);
     if (rows && rows.length > 0) timeline = rows;
+    if (allStats && allStats.length > 0) statsData = allStats;
   } catch {
     // DB not available — use defaults
   }
-
 
   return (
     <div className="pt-8 pb-24">
@@ -94,13 +99,12 @@ export default async function AboutPage() {
               full-spectrum automation house known across Pune&apos;s industrial belt for dependable execution.
             </p>
             <p>
-              We bring together mechanical designers, electrical panel fabricators, and PLC/SCADA programmers under one
+              We bring together mechanical designing, electrical engineering and software and PLC/SCADA programmers under one
               roof. This integrated capability allows us to deliver turnkey Special Purpose Machines (SPMs),
-              comprehensive testing rigs, and automated handling systems without relying on fragmented subcontractors.
+              comprehensive testing rigs and PLC based automation systems without relying on fragmented sub-entities.
             </p>
             <p>
-              Today, we serve major manufacturing brands in automotive, hydraulics, paper converting, metal fabrication,
-              and process industries, upholding our motto of &ldquo;Precision, Speed, and Zero Defects.&rdquo;
+              Today, we serve major manufacturing brands in automotive, paper converting, metal fabrication and process industries, upholding our motto of &ldquo;Precision, Speed and Zero Defects.&rdquo;
             </p>
           </div>
           <div className="mt-8 flex flex-wrap gap-4">
@@ -139,7 +143,7 @@ export default async function AboutPage() {
       </section>
 
       {/* Animated Stats Bar */}
-      <Stats />
+      <Stats statsData={statsData} />
 
       {/* Core Values */}
       <section className="py-24 bg-bg2 border-t border-b border-accent/10">

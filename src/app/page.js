@@ -2,7 +2,7 @@ import Link from "next/link";
 import Hero from "@/components/Hero";
 import Marquee from "@/components/Marquee";
 import Stats from "@/components/Stats";
-import { getServices, getProjects, initDB } from "@/lib/db";
+import { getServices, getProjects, getStats, initDB } from "@/lib/db";
 
 export const revalidate = false;
 
@@ -24,15 +24,18 @@ export default async function Home() {
   // Fetch live data from Neon DB — falls back gracefully if DB is unavailable
   let featuredServices = FALLBACK_SERVICES;
   let featuredProjects = FALLBACK_PROJECTS;
+  let stats = null;
 
   try {
     await initDB();
-    const [allServices, allProjects] = await Promise.all([
+    const [allServices, allProjects, allStats] = await Promise.all([
       getServices(),
       getProjects(),
+      getStats()
     ]);
     if (allServices.length > 0) featuredServices = allServices.slice(0, 4);
     if (allProjects.length > 0) featuredProjects = allProjects.slice(0, 3);
+    if (allStats.length > 0) stats = allStats;
   } catch (e) {
     console.error("Homepage DB fetch failed, using fallback:", e.message);
   }
@@ -75,7 +78,7 @@ export default async function Home() {
               </div>
             </div>
             <div className="absolute -bottom-5 -right-5 bg-gradient-to-br from-accent2 to-accent text-white p-5 rounded-2xl shadow-xl flex flex-col items-center">
-              <span className="font-head text-3xl font-bold leading-none">12+</span>
+              <span className="font-head text-3xl font-bold leading-none">9+</span>
               <span className="text-[0.65rem] uppercase tracking-wider mt-1">Years</span>
             </div>
           </div>
@@ -110,7 +113,7 @@ export default async function Home() {
       </section>
 
       {/* 4. Animated Stats Bar */}
-      <Stats />
+      <Stats statsData={stats} />
 
       {/* 5. Services Overview — live from CMS */}
       <section className="py-24 bg-bg2 border-b border-accent/10">

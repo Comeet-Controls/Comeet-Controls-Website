@@ -239,8 +239,8 @@ export async function POST(request) {
             <hr style="border:none;border-top:1px solid #e2e8f0;margin:20px 0;" />
             <p style="font-size:12px;color:#94a3b8;margin:0;line-height:1.6;">
               <strong style="color:#334155;">Comeet Controls Pvt. Ltd.</strong><br/>
-              709, Sukhwani Fairview, Near Aditya Birla Hospital,<br/>
-              Thergaon, Chinchwad, Pune – 411033, Maharashtra<br/>
+              Shop No. 34, Mahasainik Industrial Estate Rd,<br/>
+              T Block, MIDC, Bhosari, Pimpri-Chinchwad – 411026, Maharashtra<br/>
               <a href="mailto:sales@comeetindia.com" style="color:#0066ff;text-decoration:none;">sales@comeetindia.com</a> · 
               <a href="https://www.comeetindia.com" style="color:#0066ff;text-decoration:none;">www.comeetindia.com</a>
             </p>

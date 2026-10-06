@@ -68,7 +68,7 @@ export default function Navbar() {
                 Comeet Controls
               </span>
               <span className="text-[0.65rem] text-muted uppercase tracking-widest mt-0.5">
-                Industrial Automation · Pvt. Ltd.
+                Pvt. Ltd.
               </span>
             </div>
           </Link>

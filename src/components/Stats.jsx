@@ -39,31 +39,10 @@ const FALLBACK_STATS = [
   { id: 8, icon: "fa-headset",           value: 24,  suffix: "/7", label: "Post-Handover Support" },
 ];
 
-export default function Stats() {
+export default function Stats({ statsData = FALLBACK_STATS }) {
   const ref = useRef(null);
   const [started, setStarted] = useState(false);
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  // Fetch stats from the public API
-  useEffect(() => {
-    fetch("/api/data/stats")
-      .then((r) => r.json())
-      .then((d) => {
-        if (Array.isArray(d) && d.length > 0) {
-          setData(d);
-        } else {
-          // API returned empty array or error object — use fallback
-          setData(FALLBACK_STATS);
-        }
-        setLoading(false);
-      })
-      .catch(() => {
-        // Network or API failure — silently fall back so page never goes blank
-        setData(FALLBACK_STATS);
-        setLoading(false);
-      });
-  }, []);
+  const loading = !statsData || statsData.length === 0;
 
   // Counter animation trigger on scroll
   useEffect(() => {
@@ -77,14 +56,14 @@ export default function Stats() {
 
   // Reveal animation
   useEffect(() => {
-    if (loading || data.length === 0) return;
+    if (loading) return;
     const obs = new IntersectionObserver(
       (entries) => entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add("visible"); }),
       { threshold: 0.12 }
     );
     ref.current?.querySelectorAll(".reveal").forEach((el) => obs.observe(el));
     return () => obs.disconnect();
-  }, [loading, data]);
+  }, [loading, statsData]);
 
   return (
     <div
@@ -95,7 +74,7 @@ export default function Stats() {
       <div className="max-w-6xl mx-auto px-6 grid grid-cols-2 sm:grid-cols-4 gap-px bg-accent/10 rounded-2xl overflow-hidden">
         {loading
           ? Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)
-          : data.map((d, i) => (
+          : statsData.map((d, i) => (
               <div
                 key={d.id ?? d.label}
                 className="reveal text-center py-10 px-4 bg-[#061525] relative transition-all hover:bg-accent/[0.05] group"

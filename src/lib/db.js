@@ -107,8 +107,8 @@ async function seed() {
     const statsData = [
       { icon: "fa-face-smile",        value: 75,  suffix: "+",  label: "Happy Clients",              sort_order: 0 },
       { icon: "fa-diagram-project",   value: 50,  suffix: "+",  label: "Projects Done",              sort_order: 1 },
-      { icon: "fa-users",             value: 10,  suffix: "+",  label: "Expert Engineers",           sort_order: 2 },
-      { icon: "fa-calendar-check",    value: 12,  suffix: "+",  label: "Years Experience",           sort_order: 3 },
+      { icon: "fa-users",             value: 10,  suffix: "+",  label: "Senior automation team members",           sort_order: 2 },
+      { icon: "fa-calendar-check",    value: 9,   suffix: "+",  label: "experience",                 sort_order: 3 },
       { icon: "fa-boxes-stacked",     value: 50,  suffix: "+",  label: "Total Projects Delivered",   sort_order: 4 },
       { icon: "fa-clock-rotate-left", value: 98,  suffix: "%",  label: "On-Time Commissioning",      sort_order: 5 },
       { icon: "fa-circle-check",      value: 100, suffix: "%",  label: "FAT Clearance on 1st Run",   sort_order: 6 },

@@ -5,9 +5,9 @@ const infoCards = [
   {
     icon: "fa-location-dot",
     title: "Registered Office & Works",
-    body: "709, S. No. 33/2, Sukhwani Fairview, Near Aditya Birla Hospital, Thergaon, Chinchwad, Pune – 411033, Maharashtra, India",
+    body: "Shop No. 34, Mahasainik Industrial Estate Rd, Opp. Philips Company, T Block, MIDC, Bhosari, Pimpri-Chinchwad, Maharashtra – 411026",
     actionText: "View on Google Maps",
-    href: "https://maps.google.com/?q=Sukhwani+Fairview+Thergaon+Pune",
+    href: "https://maps.google.com/?q=Mahasainik+Industrial+Estate+T+Block+MIDC+Bhosari+Pune+411026",
   },
   {
     icon: "fa-phone",
@@ -351,7 +351,7 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* Google Maps Embed — Comeet Controls, Chinchwad Pune */}
+      {/* Google Maps Embed — Comeet Controls, Bhosari MIDC Pune */}
       <section className="pb-24 max-w-6xl mx-auto px-6">
         <div className="mb-6">
           <div className="inline-flex items-center gap-2 text-accent text-xs font-semibold uppercase tracking-widest mb-2">
@@ -361,7 +361,7 @@ export default function ContactPage() {
             Our Pune <span className="gradient-text">Facility</span>
           </h2>
           <p className="text-muted text-sm mt-1">
-            709, Sukhwani Fairview, Near Aditya Birla Hospital, Thergaon, Chinchwad, Pune – 411033
+            Shop No. 34, Mahasainik Industrial Estate Rd, Opp. Philips Company, T Block, MIDC, Bhosari, Pimpri-Chinchwad – 411026
           </p>
         </div>
         <div className="relative rounded-3xl overflow-hidden border border-accent/15 shadow-[0_20px_60px_rgba(0,0,0,0.4)]">
@@ -369,7 +369,7 @@ export default function ContactPage() {
           <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-bg/80 to-transparent z-10 pointer-events-none" />
           <iframe
             title="Comeet Controls Pvt. Ltd. — Pune Location"
-            src="https://maps.google.com/maps?q=Sukhwani%20Fairview,%20Thergaon,%20Pune&t=&z=15&ie=UTF8&iwloc=&output=embed"
+            src="https://maps.google.com/maps?q=Mahasainik%20Industrial%20Estate%20T%20Block%20MIDC%20Bhosari%20Pune&t=&z=15&ie=UTF8&iwloc=&output=embed"
             className="w-full h-[420px] border-0 block"
             allowFullScreen={true}
             loading="lazy"
@@ -378,7 +378,7 @@ export default function ContactPage() {
         </div>
         <div className="mt-4 flex flex-wrap gap-3 justify-end">
           <a
-            href="https://maps.google.com/?q=Sukhwani+Fairview+Thergaon+Chinchwad+Pune+411033"
+            href="https://maps.google.com/?q=Mahasainik+Industrial+Estate+T+Block+MIDC+Bhosari+Pune+411026"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-accent text-xs font-semibold border border-accent/25 bg-accent/5 hover:bg-accent/15 px-4 py-2 rounded-full transition-all"
@@ -386,7 +386,7 @@ export default function ContactPage() {
             <i className="fas fa-map-location-dot" /> Open in Google Maps
           </a>
           <a
-            href="https://www.google.com/maps/dir/?api=1&destination=Sukhwani+Fairview+Thergaon+Chinchwad+Pune"
+            href="https://www.google.com/maps/dir/?api=1&destination=Mahasainik+Industrial+Estate+T+Block+MIDC+Bhosari+Pune"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-[#25d366] text-xs font-semibold border border-[#25d366]/25 bg-[#25d366]/5 hover:bg-[#25d366]/15 px-4 py-2 rounded-full transition-all"
