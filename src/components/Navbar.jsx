@@ -50,7 +50,7 @@ export default function Navbar() {
           <Link href="/" className="flex items-center gap-3 group">
             <Image
               src="/logo.png"
-              alt="Comeet Logo"
+              alt="Comeet Controls Logo"
               width={100}
               height={100}
               className="rounded-lg transition-transform duration-300 group-hover:scale-105"
@@ -58,14 +58,17 @@ export default function Navbar() {
             />
             <div className="flex flex-col">
               <span
-                className="font-head font-bold text-2xl tracking-tight transition-transform duration-300 group-hover:scale-[1.02]"
+                className="font-head font-bold text-xl tracking-tight transition-transform duration-300 group-hover:scale-[1.02]"
                 style={{
                   background: "linear-gradient(90deg,#ffffff,#00b4ff)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                 }}
               >
-                Comeet
+                Comeet Controls
+              </span>
+              <span className="text-[0.65rem] text-muted uppercase tracking-widest mt-0.5">
+                Pvt. Ltd.
               </span>
             </div>
           </Link>
