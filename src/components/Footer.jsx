@@ -31,8 +31,8 @@ export default function Footer() {
               <Image
                 src="/logo.png"
                 alt="Comeet Controls Logo"
-                width={48}
-                height={48}
+                width={80}
+                height={80}
                 className="rounded-lg"
               />
               <span
