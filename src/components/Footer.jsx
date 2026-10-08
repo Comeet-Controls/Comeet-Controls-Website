@@ -30,20 +30,20 @@ export default function Footer() {
             <Link href="/" className="inline-flex items-center gap-3 mb-4">
               <Image
                 src="/logo.png"
-                alt="Comeet Controls Logo"
-                width={80}
-                height={80}
+                alt="Comeet Logo"
+                width={100}
+                height={100}
                 className="rounded-lg"
               />
               <span
-                className="font-head text-2xl font-bold"
+                className="font-head text-3xl font-bold"
                 style={{
                   background: "linear-gradient(90deg,#ffffff,#00b4ff)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                 }}
               >
-                Comeet Controls Pvt. Ltd.
+                Comeet
               </span>
             </Link>
             <p className="text-muted text-sm leading-relaxed mb-6 max-w-md">
