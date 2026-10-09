@@ -5,6 +5,24 @@ const nextConfig = {
   },
 
   // -------------------------------------------------------------------------
+  // SEO REDIRECTS - Forward old website URLs to the new Next.js routes
+  // -------------------------------------------------------------------------
+  async redirects() {
+    return [
+      { source: '/about-us', destination: '/about', permanent: true },
+      { source: '/about-us.html', destination: '/about', permanent: true },
+      { source: '/contact-us', destination: '/contact', permanent: true },
+      { source: '/contact-us.html', destination: '/contact', permanent: true },
+      { source: '/blog', destination: '/', permanent: true },
+      { source: '/blog.html', destination: '/', permanent: true },
+      { source: '/services.html', destination: '/services', permanent: true },
+      { source: '/projects.html', destination: '/projects', permanent: true },
+      { source: '/quality.html', destination: '/quality', permanent: true },
+      { source: '/index.html', destination: '/', permanent: true }
+    ];
+  },
+
+  // -------------------------------------------------------------------------
   // SECURITY HEADERS — Applied to every response
   // Protects against: Clickjacking, XSS, MIME sniffing, information leakage
   // -------------------------------------------------------------------------
