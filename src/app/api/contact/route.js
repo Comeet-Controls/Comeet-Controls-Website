@@ -121,8 +121,8 @@ export async function POST(request) {
 
     // 6. Transporter Setup
     // If SMTP credentials are not yet configured in .env.local, log and return graceful response
-    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
-      console.warn("SMTP Warning: GMAIL_USER or GMAIL_APP_PASSWORD not set in environment.");
+    if (!process.env.SMTP_USER || !process.env.SMTP_PASSWORD) {
+      console.warn("SMTP Warning: SMTP_USER or SMTP_PASSWORD not set in environment.");
       return NextResponse.json({
         success: true,
         mock: true,
@@ -131,10 +131,12 @@ export async function POST(request) {
     }
 
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: process.env.SMTP_HOST || "smtp.gmail.com",
+      port: parseInt(process.env.SMTP_PORT) || 465,
+      secure: true,
       auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_APP_PASSWORD,
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASSWORD,
       },
     });
 
@@ -146,14 +148,14 @@ export async function POST(request) {
     } catch (verifyError) {
       console.error("SMTP Authentication Error:", verifyError);
       return NextResponse.json(
-        { error: `Email server authentication failed: ${verifyError.message}. Please check GMAIL_USER and GMAIL_APP_PASSWORD in Vercel.` },
+        { error: `Email server authentication failed: ${verifyError.message}. Please check SMTP_USER and SMTP_PASSWORD in Vercel.` },
         { status: 500 }
       );
     }
 
     // 9. Send Inquiry Email to Comeet Sales Team
     await transporter.sendMail({
-      from: `"Comeet Controls Portal" <${process.env.GMAIL_USER}>`,
+      from: `"Comeet Controls Portal" <${process.env.SMTP_USER}>`,
       to: recipient,
       replyTo: email.trim(),
       subject: `[Website Inquiry] ${safeService} - ${safeName}`,
@@ -206,7 +208,7 @@ export async function POST(request) {
 
     // 10. Send Auto-Reply Confirmation to Submitter
     await transporter.sendMail({
-      from: `"Comeet Controls Pvt. Ltd." <${process.env.GMAIL_USER}>`,
+      from: `"Comeet Controls Pvt. Ltd." <${process.env.SMTP_USER}>`,
       to: email.trim(),
       subject: `We received your inquiry — Comeet Controls Pvt. Ltd.`,
       html: `
