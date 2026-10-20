@@ -9,6 +9,18 @@ const nextConfig = {
   // -------------------------------------------------------------------------
   async redirects() {
     return [
+      // Force all .vercel.app traffic to the official domain
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'host',
+            value: '(?<host>.*\\.vercel\\.app)',
+          },
+        ],
+        destination: 'https://www.comeetindia.com/:path*',
+        permanent: true,
+      },
       { source: '/about-us', destination: '/about', permanent: true },
       { source: '/about-us.html', destination: '/about', permanent: true },
       { source: '/contact-us', destination: '/contact', permanent: true },
@@ -63,14 +75,14 @@ const nextConfig = {
             value: "camera=(), microphone=(), geolocation=(), payment=()",
           },
           // Content Security Policy — restrict where scripts/styles/fonts can load from
-          // Allows: self, Google Fonts, FontAwesome CDN, Google Analytics, WhatsApp
+          // Allows: self, Google Fonts, FontAwesome CDN, Google reCAPTCHA
           {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // unsafe-inline needed for Next.js inline scripts
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com", // Google reCAPTCHA
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
-              "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com",
+              "font-src 'self' data: https://fonts.gstatic.com https://www.gstatic.com https://cdnjs.cloudflare.com",
               "img-src 'self' data: https: blob:",
               "connect-src 'self' https:",
               "frame-src 'self' https://www.google.com https://maps.google.com",
