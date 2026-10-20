@@ -117,6 +117,11 @@ export default function RootLayout({ children }) {
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
           crossOrigin="anonymous"
         />
+        {/* Google reCAPTCHA v3 — invisible bot protection for contact form */}
+        <script
+          src="https://www.google.com/recaptcha/api.js?render=6Le3_fctAAAAAD3UwYPcul4n01xJ_G9uWsCI4LIX"
+          async
+        />
         {/* JSON-LD Structured Data for Google Rich Snippets */}
         <script
           type="application/ld+json"

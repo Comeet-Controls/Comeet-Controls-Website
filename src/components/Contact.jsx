@@ -31,6 +31,15 @@ export default function Contact() {
     setStatus("sending");
     setErrMsg("");
     try {
+      // Get reCAPTCHA v3 token invisibly — user sees nothing
+      let recaptchaToken = "";
+      if (typeof window !== "undefined" && window.grecaptcha) {
+        recaptchaToken = await window.grecaptcha.execute(
+          "6Le3_fctAAAAAD3UwYPcul4n01xJ_G9uWsCI4LIX",
+          { action: "contact_form" }
+        );
+      }
+
       const res  = await fetch("/api/contact", {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
@@ -38,6 +47,7 @@ export default function Contact() {
           ...form,
           company_fax: "",      // Honeypot — always empty for real users
           _timestamp: loadTime, // Time-based bot check
+          recaptchaToken,       // reCAPTCHA v3 score token
         }),
       });
       const data = await res.json();
