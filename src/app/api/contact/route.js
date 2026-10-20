@@ -3,17 +3,31 @@ import nodemailer from "nodemailer";
 import { neon } from "@neondatabase/serverless";
 
 // ---------------------------------------------------------------------------
+// DISPOSABLE / THROWAWAY EMAIL DOMAINS BLOCKLIST
+// Bots frequently use these to submit spam without a real inbox.
+// ---------------------------------------------------------------------------
+const DISPOSABLE_DOMAINS = new Set([
+  "mailinator.com","tempmail.com","guerrillamail.com","10minutemail.com",
+  "throwaway.email","yopmail.com","trashmail.com","fakeinbox.com",
+  "sharklasers.com","guerrillamailblock.com","grr.la","guerrillamail.info",
+  "spam4.me","bccto.me","dispostable.com","tempr.email","discard.email",
+  "maildrop.cc","getairmail.com","filzmail.com","spamgourmet.com",
+  "mailnesia.com","mailnull.com","spamspot.com","trashmail.me",
+  "trashmail.at","trashmail.io","discardmail.com","tempinbox.com",
+  "spamex.com","emailondeck.com","throwam.com","getnada.com",
+  "tempmailaddress.com","mailtemp.info","spamwc.com","anonaddy.com",
+]);
+
+// ---------------------------------------------------------------------------
 // DB-backed rate limiter — works across all Vercel serverless instances.
-// In-memory Maps don't work in serverless because each request can land on
-// a different container. Using the DB ensures the limit is truly global.
+// 3 submissions allowed per IP per 24 hours.
 // ---------------------------------------------------------------------------
 async function checkRateLimit(ip) {
   const sql = neon(process.env.DATABASE_URL);
-  const WINDOW_MS = 15 * 60 * 1000; // 15 minutes
-  const MAX = 5;
+  const WINDOW_MS = 24 * 60 * 60 * 1000; // 24 hours
+  const MAX = 3;
 
   try {
-    // Ensure rate limit table exists
     await sql`
       CREATE TABLE IF NOT EXISTS rate_limits (
         ip VARCHAR(64) PRIMARY KEY,
@@ -25,8 +39,6 @@ async function checkRateLimit(ip) {
     const now = Date.now();
     const expiresAt = now + WINDOW_MS;
 
-    // Upsert: if IP exists and window is still valid, increment count.
-    // If window expired, reset it.
     const rows = await sql`
       INSERT INTO rate_limits (ip, count, expires_at)
       VALUES (${ip}, 1, ${expiresAt})
@@ -45,8 +57,29 @@ async function checkRateLimit(ip) {
     const count = rows[0]?.count ?? 1;
     return { limited: count > MAX, remaining: Math.max(0, MAX - count) };
   } catch {
-    // If DB rate limit check fails, allow the request (fail open)
     return { limited: false, remaining: MAX };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// GOOGLE reCAPTCHA v3 VERIFICATION
+// Set RECAPTCHA_SECRET_KEY in Vercel environment variables to enable.
+// ---------------------------------------------------------------------------
+async function verifyRecaptcha(token) {
+  const secret = process.env.RECAPTCHA_SECRET_KEY;
+  if (!secret) return true; // Skip if not configured yet
+
+  try {
+    const res = await fetch("https://www.google.com/recaptcha/api/siteverify", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: `secret=${secret}&response=${token}`,
+    });
+    const data = await res.json();
+    // Score below 0.5 = likely a bot. 1.0 = definitely human.
+    return data.success && data.score >= 0.5;
+  } catch {
+    return true; // Fail open — don't block real users if reCAPTCHA is down
   }
 }
 
@@ -58,13 +91,13 @@ export async function POST(request) {
       ? forwarded.split(",")[0].trim()
       : request.headers.get("x-real-ip") || "127.0.0.1";
 
-    // 2. IP Rate Limit Check
+    // 2. IP Rate Limit Check (3 per day)
     const { limited } = await checkRateLimit(ip);
     if (limited) {
       return NextResponse.json(
         {
           error:
-            "Too many submissions from your connection. Please wait 15 minutes before trying again, or call our team directly at +91 99601 94497.",
+            "You have reached the maximum of 3 inquiries per day from your connection. Please call our team directly at +91 99601 94497.",
         },
         { status: 429 }
       );
@@ -72,7 +105,7 @@ export async function POST(request) {
 
     // 3. Parse Body
     const body = await request.json();
-    const { name, email, phone, service, budget, message, company_fax } = body;
+    const { name, email, phone, service, budget, message, company_fax, _timestamp, recaptchaToken } = body;
 
     // 4. Honeypot Anti-Bot Trap:
     // 'company_fax' is invisible to human users. If filled, it's an automated bot.
@@ -81,7 +114,28 @@ export async function POST(request) {
       return NextResponse.json({ success: true });
     }
 
-    // 5. Input Validation & Bounds
+    // 5. Time-Based Bot Check:
+    // Humans cannot realistically fill a form in under 3 seconds.
+    // If _timestamp is missing or form was submitted too fast, it's a bot.
+    if (_timestamp) {
+      const elapsed = Date.now() - parseInt(_timestamp);
+      if (elapsed < 3000) {
+        return NextResponse.json({ success: true }); // Silently reject bot
+      }
+    }
+
+    // 6. Google reCAPTCHA v3 Verification
+    if (recaptchaToken) {
+      const isHuman = await verifyRecaptcha(recaptchaToken);
+      if (!isHuman) {
+        return NextResponse.json(
+          { error: "Bot activity detected. Please refresh the page and try again." },
+          { status: 403 }
+        );
+      }
+    }
+
+    // 7. Input Validation & Bounds
     if (!name || typeof name !== "string" || name.trim().length < 2) {
       return NextResponse.json({ error: "Please provide your full name." }, { status: 400 });
     }
@@ -91,7 +145,16 @@ export async function POST(request) {
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email || !emailRegex.test(email.trim()) || email.length > 120) {
-      return NextResponse.json({ error: "Please provide a valid work email address." }, { status: 400 });
+      return NextResponse.json({ error: "Please provide a valid email address." }, { status: 400 });
+    }
+
+    // 8. Disposable Email Domain Check
+    const emailDomain = email.trim().toLowerCase().split("@")[1];
+    if (DISPOSABLE_DOMAINS.has(emailDomain)) {
+      return NextResponse.json(
+        { error: "Temporary or disposable email addresses are not accepted. Please use your real work or personal email." },
+        { status: 400 }
+      );
     }
 
     if (!message || typeof message !== "string" || message.trim().length < 5) {
@@ -112,15 +175,14 @@ export async function POST(request) {
             .replace(/'/g, "&#039;")
         : "";
 
-    const safeName = sanitize(name.trim());
-    const safeEmail = sanitize(email.trim());
-    const safePhone = sanitize((phone || "").trim()) || "—";
+    const safeName    = sanitize(name.trim());
+    const safeEmail   = sanitize(email.trim());
+    const safePhone   = sanitize((phone || "").trim()) || "—";
     const safeService = sanitize(service || "General Automation Inquiry");
-    const safeBudget = sanitize(budget || "Standard");
+    const safeBudget  = sanitize(budget || "Standard");
     const safeMessage = sanitize(message.trim()).replace(/\n/g, "<br/>");
 
-    // 6. Transporter Setup
-    // If SMTP credentials are not yet configured in .env.local, log and return graceful response
+    // 9. Transporter Setup
     if (!process.env.SMTP_USER || !process.env.SMTP_PASSWORD) {
       console.warn("SMTP Warning: SMTP_USER or SMTP_PASSWORD not set in environment.");
       return NextResponse.json({
@@ -142,7 +204,7 @@ export async function POST(request) {
 
     const recipient = process.env.CONTACT_RECIPIENT || "sales@comeetindia.com";
 
-    // 8. Verify SMTP connection before sending
+    // 10. Verify SMTP connection before sending
     try {
       await transporter.verify();
     } catch (verifyError) {
@@ -153,7 +215,7 @@ export async function POST(request) {
       );
     }
 
-    // 9. Send Inquiry Email to Comeet Sales Team
+    // 11. Send Inquiry Email to Comeet Sales Team
     await transporter.sendMail({
       from: `"Comeet Controls Portal" <${process.env.SMTP_USER}>`,
       to: recipient,
@@ -206,7 +268,7 @@ export async function POST(request) {
       `,
     });
 
-    // 10. Send Auto-Reply Confirmation to Submitter
+    // 12. Send Auto-Reply Confirmation to Submitter
     await transporter.sendMail({
       from: `"Comeet Controls Pvt. Ltd." <${process.env.SMTP_USER}>`,
       to: email.trim(),

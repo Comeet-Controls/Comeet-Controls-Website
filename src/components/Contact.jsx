@@ -13,6 +13,7 @@ export default function Contact() {
   const [form, setForm]       = useState({ name:"", email:"", phone:"", service:"", message:"" });
   const [status, setStatus]   = useState("idle"); // idle | sending | success | error
   const [errMsg, setErrMsg]   = useState("");
+  const [loadTime]            = useState(() => Date.now()); // For time-based bot check
 
   useEffect(() => {
     const obs = new IntersectionObserver(
@@ -33,7 +34,11 @@ export default function Contact() {
       const res  = await fetch("/api/contact", {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify(form),
+        body:    JSON.stringify({
+          ...form,
+          company_fax: "",      // Honeypot — always empty for real users
+          _timestamp: loadTime, // Time-based bot check
+        }),
       });
       const data = await res.json();
       if (res.ok && data.success) {
