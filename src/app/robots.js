@@ -4,13 +4,11 @@
 export default function robots() {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.comeetindia.com";
   return {
-    rules: [
-      {
-        userAgent: "*",
-        allow: "/",
-        disallow: ["/admin", "/admin/", "/api/"],
-      },
-    ],
+    rules: {
+      userAgent: "*",
+      allow: "/",
+      disallow: ["/admin/", "/api/"],
+    },
     sitemap: `${baseUrl}/sitemap.xml`,
   };
 }
