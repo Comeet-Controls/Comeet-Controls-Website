@@ -5,6 +5,7 @@ on:
     branches: [main, master, dev]
   pull_request:
     branches: [main, master]
+  workflow_dispatch:
 
 # Cancel redundant runs on the same branch
 concurrency:
@@ -13,10 +14,10 @@ concurrency:
 
 jobs:
   # ============================================================
-  # JOB 1: Lint & Type Check
+  # JOB 1: Lint & Code Style
   # ============================================================
   lint:
-    name: Lint
+    name: Lint & Code Quality
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -35,7 +36,7 @@ jobs:
         run: npm run lint
 
   # ============================================================
-  # JOB 2: DB + API Unit Tests (Jest)
+  # JOB 2: DB & API Integration Tests (Jest)
   # ============================================================
   test-api:
     name: API & DB Tests
@@ -43,9 +44,9 @@ jobs:
     needs: lint
 
     env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
-      RECAPTCHA_SECRET_KEY: ${{ secrets.RECAPTCHA_SECRET_KEY }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL != '' && secrets.DATABASE_URL || vars.DATABASE_URL }}
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD != '' && secrets.ADMIN_PASSWORD || vars.ADMIN_PASSWORD }}
+      RECAPTCHA_SECRET_KEY: ${{ secrets.RECAPTCHA_SECRET_KEY != '' && secrets.RECAPTCHA_SECRET_KEY || vars.RECAPTCHA_SECRET_KEY }}
       TEST_BASE_URL: http://localhost:3000
 
     steps:
@@ -61,18 +62,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Start dev server in background
-        run: |
-          npm run dev &
-          # Wait for server to be ready (max 60s)
-          npx wait-on http://localhost:3000 --timeout 60000
-
       - name: Run DB tests (Jest)
-        run: npm test -- --testPathPattern=tests/api/db.test.js
+        run: npm run test:db
         timeout-minutes: 5
 
+      - name: Start dev server in background for API tests
+        run: |
+          npm run dev &
+          npx wait-on http://localhost:3000 --timeout 60000
+
       - name: Run API integration tests (Jest)
-        run: npm test -- --testPathPattern=tests/api/api.test.js
+        run: npm run test:api
         timeout-minutes: 5
 
   # ============================================================
@@ -84,8 +84,8 @@ jobs:
     needs: lint
 
     env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL != '' && secrets.DATABASE_URL || vars.DATABASE_URL }}
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD != '' && secrets.ADMIN_PASSWORD || vars.ADMIN_PASSWORD }}
       TEST_BASE_URL: http://localhost:3000
 
     steps:
@@ -130,10 +130,8 @@ jobs:
     needs: [test-api, test-e2e]
 
     env:
-      # Build-time only — use placeholder URLs so build doesn't fail
-      # Real secrets are set in Vercel, not needed at build time
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL != '' && secrets.DATABASE_URL || vars.DATABASE_URL }}
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD != '' && secrets.ADMIN_PASSWORD || vars.ADMIN_PASSWORD }}
       NEXT_PUBLIC_BASE_URL: https://www.comeetindia.com
 
     steps:
@@ -165,8 +163,8 @@ jobs:
     needs: lint
 
     env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL != '' && secrets.DATABASE_URL || vars.DATABASE_URL }}
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD != '' && secrets.ADMIN_PASSWORD || vars.ADMIN_PASSWORD }}
 
     steps:
       - name: Checkout code

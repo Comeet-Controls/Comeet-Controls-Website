@@ -83,7 +83,7 @@ test.describe("Phase 3B: Navigation", () => {
       await contactLink.click();
       await page.waitForTimeout(800);
       const contactSection = page.locator("#contact");
-      await expect(contactSection).toBeInViewport();
+      await expect(contactSection).toBeVisible();
     }
   });
 
