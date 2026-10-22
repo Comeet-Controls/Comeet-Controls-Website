@@ -58,7 +58,7 @@ function SpecsEditor({ specs, onChange }) {
             </button>
           </div>
         ))}
-        {specs.length === 0 && <p className="text-xs py-2" style={{ color: "#6b8ca8" }}>No specs yet. Click "Add Row" to add technical specifications.</p>}
+        {specs.length === 0 && <p className="text-xs py-2" style={{ color: "#6b8ca8" }}>No specs yet. Click &ldquo;Add Row&rdquo; to add technical specifications.</p>}
       </div>
     </div>
   );

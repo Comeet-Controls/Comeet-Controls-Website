@@ -5,7 +5,7 @@
 
 import { createHmac } from "crypto";
 
-const SALT = "comeet_salt_2024";
+const SALT = process.env.SESSION_SALT || "comeet_salt_2024";
 const COOKIE_NAME = "admin_session";
 const SEVEN_DAYS = 7 * 24 * 60 * 60; // seconds
 
