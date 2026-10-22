@@ -84,6 +84,16 @@ async function verifyRecaptcha(token) {
 }
 
 export async function POST(request) {
+  // ---------------------------------------------------------------------------
+  // 🚫 TEMPORARILY DISABLED — Contact form email sending is paused.
+  // To re-enable, remove this block and the early return below.
+  // ---------------------------------------------------------------------------
+  return NextResponse.json(
+    { error: "Our online inquiry form is temporarily unavailable. Please call us directly at +91 99601 94497 or email sales@comeetindia.com" },
+    { status: 503 }
+  );
+  // ---------------------------------------------------------------------------
+
   try {
     // 1. Extract Client IP
     const forwarded = request.headers.get("x-forwarded-for");

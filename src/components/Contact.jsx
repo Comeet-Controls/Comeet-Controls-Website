@@ -99,7 +99,42 @@ export default function Contact() {
 
         {/* Form */}
         <div className="reveal-right">
-          {status === "success" ? (
+          {/* ----------------------------------------------------------------
+              🚫 FORM TEMPORARILY DISABLED — Remove this block to re-enable.
+              ---------------------------------------------------------------- */}
+          {true ? (
+            <div className="flex flex-col items-center justify-center h-full text-center p-12 bg-surface border border-amber-500/30 rounded-2xl gap-5">
+              <div className="w-16 h-16 rounded-full bg-amber-500/15 flex items-center justify-center text-3xl text-amber-400 mb-2">
+                <i className="fas fa-tools" />
+              </div>
+              <h3 className="font-head font-bold text-xl">Online Form Temporarily Unavailable</h3>
+              <p className="text-muted text-sm leading-relaxed">
+                We are currently improving our contact system to serve you better. In the meantime, please reach us directly:
+              </p>
+              <div className="flex flex-col gap-3 w-full mt-2">
+                <a
+                  href="tel:+919960194497"
+                  className="w-full flex items-center justify-center gap-2.5 bg-gradient-to-r from-accent2 to-accent text-white font-semibold text-base py-4 rounded-xl transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_40px_rgba(0,102,255,0.45)]"
+                >
+                  <i className="fas fa-phone" /> Call Us: +91 99601 94497
+                </a>
+                <a
+                  href="mailto:sales@comeetindia.com"
+                  className="w-full flex items-center justify-center gap-2.5 border border-accent/30 text-accent font-semibold text-base py-4 rounded-xl transition-all hover:bg-accent/10"
+                >
+                  <i className="fas fa-envelope" /> sales@comeetindia.com
+                </a>
+                <a
+                  href="https://wa.me/919960194497"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full flex items-center justify-center gap-2.5 border border-[#25D366]/30 text-[#25D366] font-semibold text-base py-4 rounded-xl transition-all hover:bg-[#25D366]/10"
+                >
+                  <i className="fab fa-whatsapp" /> WhatsApp Us
+                </a>
+              </div>
+            </div>
+          ) : status === "success" ? (
             <div className="flex flex-col items-center justify-center h-full text-center p-12 bg-surface border border-[#00c864]/30 rounded-2xl">
               <div className="w-16 h-16 rounded-full bg-[#00c864]/15 flex items-center justify-center text-3xl text-[#00c864] mb-6">
                 <i className="fas fa-circle-check" />
