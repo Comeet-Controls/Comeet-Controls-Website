@@ -9,6 +9,7 @@ export async function GET() {
     const projects = await getProjects();
     return NextResponse.json(projects);
   } catch (e) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    console.error("Projects API error:", e);
+    return NextResponse.json({ error: "Data temporarily unavailable." }, { status: 500 });
   }
 }

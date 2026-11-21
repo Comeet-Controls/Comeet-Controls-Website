@@ -5,9 +5,23 @@
 
 import { createHmac } from "crypto";
 
-const SALT = process.env.SESSION_SALT || "comeet_salt_2024";
 const COOKIE_NAME = "admin_session";
 const SEVEN_DAYS = 7 * 24 * 60 * 60; // seconds
+
+/**
+ * Returns the SESSION_SALT env var — checked at runtime only (not at module
+ * load time) so that Next.js static analysis and builds succeed without the
+ * env var present in the build environment.
+ */
+function getSalt() {
+  const salt = process.env.SESSION_SALT;
+  if (!salt) {
+    throw new Error(
+      "SESSION_SALT environment variable is not set. Add a random 32-char string to Vercel Environment Variables."
+    );
+  }
+  return salt;
+}
 
 /**
  * Generates the expected session token using HMAC-SHA256.
@@ -20,7 +34,7 @@ function getExpectedToken() {
       "ADMIN_PASSWORD environment variable is not set. Add it to Vercel environment variables."
     );
   }
-  return createHmac("sha256", SALT).update(password).digest("hex");
+  return createHmac("sha256", getSalt()).update(password).digest("hex");
 }
 
 /**

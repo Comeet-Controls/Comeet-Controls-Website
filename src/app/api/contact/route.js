@@ -220,7 +220,7 @@ export async function POST(request) {
     } catch (verifyError) {
       console.error("SMTP Authentication Error:", verifyError);
       return NextResponse.json(
-        { error: `Email server authentication failed: ${verifyError.message}. Please check SMTP_USER and SMTP_PASSWORD in Vercel.` },
+        { error: "Email server configuration error. Please contact us directly at sales@comeetindia.com." },
         { status: 500 }
       );
     }
@@ -328,7 +328,7 @@ export async function POST(request) {
   } catch (error) {
     console.error("Contact API Server Error:", error);
     return NextResponse.json(
-      { error: "Failed to send email. Error: " + (error.message || "Unknown error") },
+      { error: "Failed to process inquiry. Please try again or call us directly at +91 99601 94497." },
       { status: 500 }
     );
   }

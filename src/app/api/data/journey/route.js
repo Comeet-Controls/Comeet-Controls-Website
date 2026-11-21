@@ -9,6 +9,7 @@ export async function GET() {
     const journey = await getJourney();
     return NextResponse.json(journey);
   } catch (e) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    console.error("Journey API error:", e);
+    return NextResponse.json({ error: "Data temporarily unavailable." }, { status: 500 });
   }
 }

@@ -9,6 +9,7 @@ export async function GET() {
     const certifications = await getCertifications();
     return NextResponse.json(certifications);
   } catch (e) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    console.error("Certifications API error:", e);
+    return NextResponse.json({ error: "Data temporarily unavailable." }, { status: 500 });
   }
 }

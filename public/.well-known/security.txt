@@ -1,0 +1,3 @@
+Contact: mailto:sales@comeetindia.com
+Preferred-Languages: en, hi
+Canonical: https://www.comeetindia.com/.well-known/security.txt

@@ -9,6 +9,7 @@ export async function GET() {
     const stats = await getStats();
     return NextResponse.json(stats);
   } catch (e) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    console.error("Stats API error:", e);
+    return NextResponse.json({ error: "Data temporarily unavailable." }, { status: 500 });
   }
 }

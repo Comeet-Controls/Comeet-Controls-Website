@@ -1,5 +1,3 @@
-// server.js — Custom Next.js server for cPanel Node.js App hosting
-// This file is the entry point configured in cPanel "Setup Node.js App"
 const { createServer } = require('http');
 const { parse } = require('url');
 const next = require('next');

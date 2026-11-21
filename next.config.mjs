@@ -1,8 +1,6 @@
 /** @type {import("next").NextConfig} */
 const nextConfig = {
-  experimental: {
-    serverComponentsExternalPackages: ["nodemailer", "@neondatabase/serverless"],
-  },
+  serverExternalPackages: ["nodemailer", "@neondatabase/serverless"],
 
   // -------------------------------------------------------------------------
   // SEO REDIRECTS - Forward old website URLs to the new Next.js routes
@@ -63,6 +61,11 @@ const nextConfig = {
           {
             key: "X-Powered-By",
             value: "",
+          },
+          // HTTP Strict Transport Security — force HTTPS permanently (2 years)
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains; preload",
           },
           // Enable browser's built-in XSS filter
           {
