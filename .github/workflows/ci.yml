@@ -127,11 +127,12 @@ jobs:
   build:
     name: Build Check
     runs-on: ubuntu-latest
-    needs: [test-api, test-e2e]
+    needs: [test-api, test-e2e, audit]
 
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL != '' && secrets.DATABASE_URL || vars.DATABASE_URL }}
       ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD != '' && secrets.ADMIN_PASSWORD || vars.ADMIN_PASSWORD }}
+      SESSION_SALT: ${{ secrets.SESSION_SALT != '' && secrets.SESSION_SALT || vars.SESSION_SALT }}
       NEXT_PUBLIC_BASE_URL: https://www.comeetindia.com
 
     steps:
@@ -155,7 +156,42 @@ jobs:
         run: echo "✅ Build passed. Vercel will auto-deploy from main branch."
 
   # ============================================================
-  # JOB 5: Security Headers Check
+  # JOB 5: Dependency Vulnerability Audit (npm audit)
+  # Fails CI on Critical or High CVEs in production dependencies.
+  # PDF check: "Run npm audit, report Critical/High"
+  # ============================================================
+  audit:
+    name: Dependency Security Audit
+    runs-on: ubuntu-latest
+    needs: lint
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run npm audit (fail on Critical/High in production deps)
+        run: |
+          echo "=== npm audit (production only) ==="
+          # --omit=dev skips dev-only vulnerabilities (PostCSS, ESLint, etc.)
+          # --audit-level=high fails CI only on High or Critical CVEs
+          npm audit --omit=dev --audit-level=high
+        continue-on-error: false
+
+      - name: Full audit report (informational — includes dev deps)
+        run: npm audit || true
+        # This step always passes — it's just for the log record
+
+  # ============================================================
+  # JOB 6: Security Headers Check
   # ============================================================
   security-headers:
     name: Security Headers Check

@@ -79,11 +79,13 @@ const nextConfig = {
           },
           // Content Security Policy — restrict where scripts/styles/fonts can load from
           // Allows: self, Google Fonts, FontAwesome CDN, Google reCAPTCHA
+          // NOTE: 'unsafe-inline' is required by Next.js inline scripts and reCAPTCHA.
+          // 'unsafe-eval' was removed — not needed in production builds (only dev HMR uses it).
           {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com", // Google reCAPTCHA
+              "script-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com", // reCAPTCHA (no unsafe-eval)
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
               "font-src 'self' data: https://fonts.gstatic.com https://www.gstatic.com https://cdnjs.cloudflare.com",
               "img-src 'self' data: https: blob:",

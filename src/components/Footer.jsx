@@ -115,6 +115,13 @@ export default function Footer() {
           <div className="flex items-center gap-6 text-xs text-muted">
             <span>Shop No. 34, MIDC Bhosari, T Block, Pimpri-Chinchwad, Pune 411026</span>
             <span className="hidden md:inline-block">·</span>
+            <Link
+              href="/privacy"
+              className="hover:text-accent transition-colors duration-200 underline underline-offset-2"
+            >
+              Privacy Policy
+            </Link>
+            <span className="hidden md:inline-block">·</span>
             <span className="text-accent font-medium">Industry 4.0 Certified</span>
           </div>
         </div>
